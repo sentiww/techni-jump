@@ -33,14 +33,14 @@ export default class LevelGenerator {
    */
   public generateSegment(segmentId: string): Phaser.Tilemaps.Tilemap{
     /* LayerData from mainTilemap by given Id */
-    let segmentTemplate =
+    let segmentLayerData =
         this.mainTilemap.layers.find((layerData: Phaser.Tilemaps.LayerData) => {
           return layerData.name === segmentId;
-        })
+        });
+    let segmentTemplate = new Phaser.Tilemaps.LayerData(segmentLayerData);
 
     /* MapData config for new Tilemap */
     let segmentMapDataConfig: Phaser.Types.Tilemaps.MapDataConfig = {
-        //name: segmentTemplate.name,
         width: segmentTemplate.width,
         height: segmentTemplate.height,
         tileWidth: segmentTemplate.tileWidth,
