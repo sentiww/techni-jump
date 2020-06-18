@@ -62,10 +62,11 @@ export default class LevelGenerator {
       /* Additional metadata for our Tilemap such as its ID, IDs of the next compatible segments*/
       let segmentTilemap: any =
           new Phaser.Tilemaps.Tilemap(this.mainTilemap.scene, segmentMapData);
-      segmentTilemap.nextSegments =
-          segmentTemplate.properties.find((property: {name: string}) => {
+      segmentTilemap.nextSegments = 
+          Array.prototype.slice.call(segmentTemplate.properties, 0).find((property: {name: string}) => {
             return property.name.toLowerCase() === 'connections';
           })['value'].split(',');
+
       segmentTilemap.currentSegment = segmentTemplate.name;
 
       return segmentTilemap;
