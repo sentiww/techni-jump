@@ -35,22 +35,26 @@ export default class Level extends Phaser.Scene
     this.levelGenerator = new LevelGenerator(map);
     this.tileset = map.addTilesetImage(map.tilesets[0].name, 'tileset');
 
+    /* Initial segment */
     this.insertSegment('A');
+    
     for (let i = 0; i < 5; i++) {
       this.insertSegment(this.randomNextSegmentId(this.lastSegmentData.nextIds));
     }
   }
 
   update() {
+    /* Displaying segments form list, which are not displayed */
     this.segmentsList.filter(segment => segment.displayed === false)
         .forEach(segment => {
-          segment.tilemap.createStaticLayer(0, this.tileset, this.lastDisplayedSegmentX, 0);
+          segment.tilemap.createDynamicLayer(0, this.tileset, this.lastDisplayedSegmentX, 0);
           this.lastDisplayedSegmentX += segment.tilemap.widthInPixels;
           segment.displayed = true;
           console.log(this.segmentsList, this.lastDisplayedSegmentX)
         })
   }
 
+  /* Generates new Tilemap and inserts it to list of segments building the level */
   private insertSegment(segmentId: string): void {
     let segmentTilemap: any = this.levelGenerator.generateSegment(segmentId);
 

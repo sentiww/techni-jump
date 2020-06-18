@@ -18,27 +18,27 @@ export default class LevelGenerator {
    */
   private mainTilemap: Phaser.Tilemaps.Tilemap;
 
-  /**
-   * Array of Tilemaps, which will be copied to
-   * generate level sequence.
-   *
-   * @name LevelGenerator#segmentsTemplates
-   * @type {Phaser.Tilemaps.Tilemap[]}
-   */
-  public segmentsTemplates: Phaser.Tilemaps.Tilemap[];
-
   public constructor(mainTilemap: Phaser.Tilemaps.Tilemap) {
     this.mainTilemap = mainTilemap;
-
-    /* Converting all layers from original map to different tilemaps */
   }
 
+  /**
+   * Generate new Tilemap from layer with given ID.
+   *
+   * @method LevelGenerator#generateSegment
+   *
+   * @param {string} segmentId ID of segment to generate.
+   *
+   * @return {Phaser.Tilemaps.Tilemap} Tilemap containing one layer, which is the segment.
+   */
   public generateSegment(segmentId: string): Phaser.Tilemaps.Tilemap{
+    /* LayerData from mainTilemap by given Id */
     let segmentTemplate =
         this.mainTilemap.layers.find((layerData: Phaser.Tilemaps.LayerData) => {
           return layerData.name === segmentId;
         })
 
+    /* MapData config for new Tilemap */
     let segmentMapDataConfig: Phaser.Types.Tilemaps.MapDataConfig = {
         //name: segmentTemplate.name,
         width: segmentTemplate.width,
@@ -55,9 +55,11 @@ export default class LevelGenerator {
         tilesets: this.mainTilemap.tilesets,
       }
 
+      /* MapData object for new Tilemap */
       let segmentMapData: Phaser.Tilemaps.MapData =
           new Phaser.Tilemaps.MapData(segmentMapDataConfig);
 
+      /* Additional metadata for our Tilemap such as its ID, IDs of the next compatible segments*/
       let segmentTilemap: any =
           new Phaser.Tilemaps.Tilemap(this.mainTilemap.scene, segmentMapData);
       segmentTilemap.nextSegments =
