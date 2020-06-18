@@ -10,6 +10,7 @@ export default class Level extends Phaser.Scene
     displayed: boolean,
     toDestroy: boolean,
     tilemap: Phaser.Tilemaps.Tilemap,
+    layer: Phaser.Tilemaps.StaticTilemapLayer
   }[] = [];
 
   private lastSegmentData: {
@@ -22,6 +23,9 @@ export default class Level extends Phaser.Scene
   private player: Phaser.Physics.Arcade.Sprite;
   private cursors: Phaser.Types.Input.Keyboard.CursorKeys;
 
+  private maxBounds: number = 480;
+  private xBounds: number = 0;
+
   constructor () {
     super('level');
   }
@@ -31,7 +35,7 @@ export default class Level extends Phaser.Scene
     this.load.image('tileset', 'assets/tileset.png');
     this.load.spritesheet('hero',
 	    'assets/hero.png',
-      { frameWidth: 32, frameHeight: 48 }
+      { frameWidth: 16, frameHeight: 16 }
     );
   }
 
@@ -44,35 +48,48 @@ export default class Level extends Phaser.Scene
 
     /* Initial segment */
     this.insertSegment('A');
-    
-    for (let i = 0; i < 5; i++) {
-      this.insertSegment(this.randomNextSegmentId(this.lastSegmentData.nextIds));
-    }
+
 
     this.player = this.physics.add.sprite(0, 130, 'hero');
     this.player.setBounce(0.2);
 
-    /* TODO */
-    //this.physics.add.collider(this.player, *swiat*);
-
     this.cursors = this.input.keyboard.createCursorKeys();
 
-    this.cameras.main.setBounds(0, 0, Number.MAX_VALUE, 270);
-    this.physics.world.setBounds(0, 0, Number.MAX_VALUE, 270);
+    this.cameras.main.setBounds(this.xBounds, 0, this.maxBounds, 270);
+    this.physics.world.setBounds(this.xBounds, 0, this.maxBounds, 270);
     this.cameras.main.startFollow(this.player, true);
+    this.player.setVelocityX(160);
   }
 
   update() {
+    this.cameras.main.setBounds(this.xBounds, 0, this.maxBounds, 270);
+    this.physics.world.setBounds(this.xBounds, 0, this.maxBounds, 270);
+
     /* Displaying segments form list, which are not displayed */
     this.segmentsList.filter(segment => segment.displayed === false)
         .forEach(segment => {
-          segment.tilemap.createDynamicLayer(0, this.tileset, this.lastDisplayedSegmentX, 0);
+          segment.layer = segment.tilemap.createStaticLayer(0, this.tileset, this.lastDisplayedSegmentX, 0);
           this.lastDisplayedSegmentX += segment.tilemap.widthInPixels;
           segment.displayed = true;
           console.log(this.segmentsList, this.lastDisplayedSegmentX)
         })
-        
-    this.player.setVelocity(0, 0);
+    
+    if(this.player.x + 480 >= this.lastDisplayedSegmentX)
+    {
+      this.insertSegment(this.randomNextSegmentId(this.lastSegmentData.nextIds));
+      this.maxBounds += 80;
+    }
+      
+      
+    if(this.player.x - 480 >= this.segmentsList[0].layer.x)
+      {
+        this.segmentsList[0].layer.destroy();
+        this.segmentsList[0].tilemap.destroy();
+        this.segmentsList.shift();
+        this.xBounds += 80;
+      }
+
+    //this.player.setVelocity(0, 0);
     if(this.cursors.left.isDown)
       this.player.setVelocityX(-160);
     if(this.cursors.right.isDown)
@@ -91,6 +108,7 @@ export default class Level extends Phaser.Scene
       displayed: false,
       toDestroy: false,
       tilemap: segmentTilemap,
+      layer: null
     })
 
     this.lastSegmentData = {
