@@ -8,6 +8,13 @@ const config = {
     backgroundColor: '#125555',
     width: 480,
     height: 270,
+    physics: {
+        default: 'arcade',
+        arcade: {
+            gravity: { y: 0 },
+            debug: false
+        }
+    },
     pixelart:true,
     zoom:3,
     scene: Level

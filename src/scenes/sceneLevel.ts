@@ -19,13 +19,20 @@ export default class Level extends Phaser.Scene
 
   private lastDisplayedSegmentX: number = 0;
 
+  private player: Phaser.Physics.Arcade.Sprite;
+  private cursors: Phaser.Types.Input.Keyboard.CursorKeys;
+
   constructor () {
     super('level');
   }
 
   preload () {
     this.load.tilemapTiledJSON('mapSegments', 'assets/mapSegments.json');
-    this.load.image('tileset', 'assets/tileset.png')
+    this.load.image('tileset', 'assets/tileset.png');
+    this.load.spritesheet('hero',
+	    'assets/hero.png',
+      { frameWidth: 32, frameHeight: 48 }
+    );
   }
 
   create() {
@@ -41,6 +48,18 @@ export default class Level extends Phaser.Scene
     for (let i = 0; i < 5; i++) {
       this.insertSegment(this.randomNextSegmentId(this.lastSegmentData.nextIds));
     }
+
+    this.player = this.physics.add.sprite(0, 130, 'hero');
+    this.player.setBounce(0.2);
+
+    /* TODO */
+    //this.physics.add.collider(this.player, *swiat*);
+
+    this.cursors = this.input.keyboard.createCursorKeys();
+
+    this.cameras.main.setBounds(0, 0, Number.MAX_VALUE, 270);
+    this.physics.world.setBounds(0, 0, Number.MAX_VALUE, 270);
+    this.cameras.main.startFollow(this.player, true);
   }
 
   update() {
@@ -52,6 +71,16 @@ export default class Level extends Phaser.Scene
           segment.displayed = true;
           console.log(this.segmentsList, this.lastDisplayedSegmentX)
         })
+        
+    this.player.setVelocity(0, 0);
+    if(this.cursors.left.isDown)
+      this.player.setVelocityX(-160);
+    if(this.cursors.right.isDown)
+      this.player.setVelocityX(160);
+    if(this.cursors.down.isDown)
+      this.player.setVelocityY(330);
+    if(this.cursors.up.isDown)
+      this.player.setVelocityY(-330);
   }
 
   /* Generates new Tilemap and inserts it to list of segments building the level */
