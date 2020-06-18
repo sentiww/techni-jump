@@ -2,7 +2,9 @@ import LevelGenerator from '../levelgenerator';
 
 export default class Level extends Phaser.Scene
 {
-  private LevelGenerator: LevelGenerator = new LevelGenerator();
+  private levelGenerator: LevelGenerator;
+
+  private tileset: any;
 
   constructor () {
     super('level');
@@ -14,6 +16,11 @@ export default class Level extends Phaser.Scene
   }
 
   create() {
+    let map: Phaser.Tilemaps.Tilemap =
+        this.make.tilemap({key: 'mapSegments'});
+
+    this.levelGenerator = new LevelGenerator(map);
+    this.tileset = map.addTilesetImage(map.tilesets[0].name, 'tileset');
 
   }
 }
