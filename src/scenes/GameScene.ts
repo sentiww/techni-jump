@@ -181,16 +181,11 @@ export default class GameScene extends Phaser.Scene
     {
         while (this.map.length < 12) {
             let next = this.originSegments.map(segment => segment.key);
-            if (this.map.length > 0) {
-                next = this.originSegments.find(segment => segment.key === this.lastSegmentKey).next;
-            }
             const key = next[Math.floor(Math.random() * next.length)];
             const segment = this.make.tilemap({ data: this.originSegments.find(segment => segment.key === key).data, tileWidth: TILE_WIDTH, tileHeight: TILE_HEIGHT });
             segment.createDynamicLayer('layer', this.originTileset, this.nextSegmentPosition, -280);
             console.log(segment);
             segment.setCollisionBetween(1, 9999);
-
-
 
             let gradientHint = this.add.image(this.nextSegmentPosition, 0, 'red-gradient').setOrigin(0, 0);
             gradientHint.depth = -1;
