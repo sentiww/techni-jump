@@ -130,8 +130,6 @@ export default class GameScene extends Phaser.Scene
     {
         this.cleanMap();
         this.generateMap();
-        this.spikeCheck();
-        this.removeSpikes();
         this.map.forEach(mapsegment => {
           let tilemap = mapsegment.tilemap
           let tilemapLayerGameObj = tilemap.getLayer('layer').tilemapLayer;
@@ -173,13 +171,18 @@ export default class GameScene extends Phaser.Scene
 
         if (cursors.space.isDown) {
             this.scene.pause();
+            this.spikes = [];
             this.scene.restart();
         }
 
         if ((<Phaser.Physics.Arcade.Body>this.player.body).y > 280 || (<Phaser.Physics.Arcade.Body>this.player.body).x + 8 <= this.laser.x){
           this.scene.pause();
+          this.spikes = [];
           this.scene.restart();
         }
+
+        this.spikeCheck();
+        this.removeSpikes();
     }
 
     private checkPlayerJump(isKeyDown: boolean) {
