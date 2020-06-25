@@ -155,6 +155,7 @@ export default class GameScene extends Phaser.Scene
               timeScale: 1 + (1 - this.playerSpeedTimer.timeScale),
               onComplete: () => {
                 this.cameras.main.shake(100 / this.playerSpeedTimer.timeScale, 0.003);
+                //this.cameras.main.flash(50 / this.playerSpeedTimer.timeScale, 255, 255, 255);
                 this.sound.play('platform');
               },
             });
