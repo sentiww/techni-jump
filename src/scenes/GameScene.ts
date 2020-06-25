@@ -28,10 +28,10 @@ const SEGMENT_WIDTH: number = 5;
 const TILE_WIDTH: number = 16;
 const TILE_HEIGHT: number = 16;
 const INITIAL_SPEED: number = 50;
-const MAX_SPEED: number = 220;
+const MAX_SPEED: number = 250;
 const SPEED_INC_TIME: number = 1000;
-const SPEED_INC_STEP: number = 1.5;
-const SPEED_INC_TIMEFACTOR: number = -0.01;
+const SPEED_INC_STEP: number = 2;
+const SPEED_INC_TIMEFACTOR: number = -0.002;
 
 export default class GameScene extends Phaser.Scene
 {
@@ -56,8 +56,9 @@ export default class GameScene extends Phaser.Scene
     {
         this.load.spritesheet('tilesetold', 'assets/images/tileset-player.png', { frameWidth: 16, frameHeight: 16, margin: 1, spacing: 2 });
         this.load.spritesheet('tileset', 'assets/images/tileset-extruded.png', { frameWidth: 16, frameHeight: 16, margin: 1, spacing: 2 });
-        this.load.tilemapTiledJSON('tilemap', 'assets/tilemaps/tilemap.json');
+        this.load.tilemapTiledJSON('tilemap', 'assets/tilemaps/tilemapFlat.json');
         this.load.image('gradient', 'assets/images/gradient.png');
+        this.load.audio('music', 'assets/audio/level-music.ogg');
         this.cameras.main.setBackgroundColor('#000000');
     }
 
@@ -98,15 +99,14 @@ export default class GameScene extends Phaser.Scene
         });
         this.generateMap();
         this.cameras.main.setBounds(0, 0, Number.MAX_VALUE, this.cameras.main.height);
-        this.cameras.main.startFollow(this.player, false, 0.08, 0.08);
-        this.cameras.main.setRoundPixels(true);
+        this.cameras.main.startFollow(this.player, true, 1, 1);
         (<Phaser.Physics.Arcade.Body>this.player.body).setVelocityX(this.playerSpeed);
+        this.sound.play('music');
+        this.sound.volume = 0.6
     }
 
     update()
     {
-        //this.player.x = Math.ceil(this.player.x);
-        const cursors = this.input.keyboard.createCursorKeys();
         this.cleanMap();
         this.generateMap();
 
@@ -122,7 +122,7 @@ export default class GameScene extends Phaser.Scene
               targets: tilemapLayerGameObj,
               y: 0,
               ease: 'Quart.easeIn',
-              duration: 500,
+              duration: 500 - this.playerSpeed,
               timeScale: 1 + (1 - this.playerSpeedTimer.timeScale),
             });
             let gradientHint = this.gradients.find(sprite => sprite.x === tilemapLayerGameObj.x)
@@ -139,9 +139,9 @@ export default class GameScene extends Phaser.Scene
         }
         );
 
-
         (<Phaser.Physics.Arcade.Body>this.player.body).setVelocityX(this.playerSpeed);
 
+        const cursors = this.input.keyboard.createCursorKeys();
 
         if (cursors.up.isDown)
           this.checkPlayerJump(true);
@@ -153,7 +153,6 @@ export default class GameScene extends Phaser.Scene
             this.scene.restart();
         }
 
-        console.log((<Phaser.Physics.Arcade.Body>this.player.body).y);
         if ((<Phaser.Physics.Arcade.Body>this.player.body).y > 280){
           this.scene.pause();
           this.scene.restart();
