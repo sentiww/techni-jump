@@ -11,6 +11,11 @@ interface MapSegment {
     animationStarted: boolean;
 }
 
+interface SpikeData {
+    spikeTile: Phaser.Tilemaps.Tile;
+    spikeEnabled: boolean;
+}
+
 enum colorMap {
   red = 0xff0000,
   orange = 0xff8000,
@@ -47,6 +52,8 @@ export default class GameScene extends Phaser.Scene
     private playerSpeedTimer: Phaser.Time.TimerEvent;
     private playerSpeed: number;
     private laser: Phaser.GameObjects.Sprite;
+    private spikeProbability: number;
+    private spikes: SpikeData[] = [];
 
     constructor ()
     {
@@ -55,7 +62,7 @@ export default class GameScene extends Phaser.Scene
 
     preload()
     {
-        this.load.spritesheet('player', 'assets/images/tileset-player.png', { frameWidth: 16, frameHeight: 16, margin: 1, spacing: 2 });
+        this.load.spritesheet('player', 'assets/images/player.png', { frameWidth: 16, frameHeight: 16, margin: 0, spacing: 0 });
         this.load.spritesheet('tileset', 'assets/images/tileset-extruded.png', { frameWidth: 16, frameHeight: 16, margin: 1, spacing: 2 });
         this.load.spritesheet('laser', 'assets/images/laser.png', { frameWidth: 480, frameHeight: 270, margin: 0, spacing: 0 });
         this.load.tilemapTiledJSON('tilemap', 'assets/tilemaps/tilemap.json');
@@ -87,7 +94,7 @@ export default class GameScene extends Phaser.Scene
                     data: layer.data.map(tiles => tiles.map(tile => tile.index)),
                 };
             });
-        this.player = this.physics.add.sprite(8, 8, 'player', 1);
+        this.player = this.physics.add.sprite(8, 8, 'player', Math.floor(Math.random() * 3));
         this.player.setDepth(1);
         this.playerSpeedTimer = this.time.addEvent({
             delay: SPEED_INC_TIME,
@@ -105,7 +112,7 @@ export default class GameScene extends Phaser.Scene
         {
           key: '_laser',
           frames: this.anims.generateFrameNumbers('laser', { start: 0, end: 3 }),
-          frameRate: 30,
+          frameRate: 24,
           repeat: -1
         });
         this.laser.anims.play('_laser');
@@ -113,6 +120,7 @@ export default class GameScene extends Phaser.Scene
         this.cameras.main.setBounds(0, 0, Number.MAX_VALUE, this.cameras.main.height);
         this.cameras.main.startFollow(this.player, true, 1, 1);
         (<Phaser.Physics.Arcade.Body>this.player.body).setVelocityX(this.playerSpeed);
+        this.spikeProbability = 0.10;
         this.sound.play('music');
         this.sound.volume = 0.6
     }
@@ -121,7 +129,8 @@ export default class GameScene extends Phaser.Scene
     {
         this.cleanMap();
         this.generateMap();
-
+        this.spikeCheck();
+        this.removeSpikes();
         this.map.forEach(mapsegment => {
           let tilemap = mapsegment.tilemap
           let tilemapLayerGameObj = tilemap.getLayer('layer').tilemapLayer;
@@ -166,7 +175,7 @@ export default class GameScene extends Phaser.Scene
             this.scene.restart();
         }
 
-        if ((<Phaser.Physics.Arcade.Body>this.player.body).y > 280 || (<Phaser.Physics.Arcade.Body>this.player.body).x + 5 <= this.laser.x){
+        if ((<Phaser.Physics.Arcade.Body>this.player.body).y > 280 || (<Phaser.Physics.Arcade.Body>this.player.body).x + 8 <= this.laser.x){
           this.scene.pause();
           this.scene.restart();
         }
@@ -199,14 +208,25 @@ export default class GameScene extends Phaser.Scene
     {
         while (this.map.length < 12) {
             let next = this.originSegments.map(segment => segment.key);
+            if (this.map.length > 0) 
+              next = this.originSegments.find(segment => segment.key === this.lastSegmentKey).next;
             const key = next[Math.floor(Math.random() * next.length)];
             const segment = this.make.tilemap({ data: this.originSegments.find(segment => segment.key === key).data, tileWidth: TILE_WIDTH, tileHeight: TILE_HEIGHT });
             if (this.map.length < 6) {
+              segment.forEachTile(tile => {
+                if(tile.index === 319)
+                {
+                  tile.destroy();
+                  tile.index = -1;
+                }
+              })
               segment.createDynamicLayer('layer', this.originTileset, this.nextSegmentPosition, 0);
-            } else {
+            } 
+            else {
+              this.createSpikes(segment);
               segment.createDynamicLayer('layer', this.originTileset, this.nextSegmentPosition, -280);
             }
-            segment.setCollisionBetween(1, 9999);
+            segment.setCollisionBetween(1, 317);
 
             if (this.map.length >= 6) {
               let gradientHint =
@@ -238,5 +258,44 @@ export default class GameScene extends Phaser.Scene
               this.gradients.splice(i, 1);
           }
         }
+    }
+    private createSpikes(seg: Phaser.Tilemaps.Tilemap)                //Creates spikes from segments
+    {
+      seg.forEachTile(tile => {
+        if(tile.index === 319)
+        {
+          if(Math.random() < this.spikeProbability)                   //Creates based on spikeProbability
+            this.spikes.push({spikeTile: tile, spikeEnabled: true});
+          else                                                        //Else destroys spikes and hides them by index = -1
+          {
+            tile.destroy();
+            tile.index = -1;
+          } 
+        }
+      })
+    }
+    private removeSpikes()                                            //Removes old spikes off-screen
+    {
+      this.spikes.forEach(spike => {
+        if(spike.spikeTile.getRight() < this.player.x - 240)
+        {
+            spike.spikeTile.destroy();
+            this.spikes.shift();
+        }
+      })
+    }
+    private spikeCheck()
+    {
+      this.spikes.forEach(spike => {
+        if(spike.spikeTile.y * 16 === Math.round(this.player.y - 8)   //Checking if player is at the spikes Y
+          && spike.spikeTile.getLeft() < Math.round(this.player.x)    //Checking if player is between left X of spike and...
+          && Math.round(this.player.x) < spike.spikeTile.getRight()   //... between right X of the spike
+          && this.playerSpeed > 20                                    //Checking if speed is above 20
+          && spike.spikeEnabled)                                      //Checking if the spike hasn't been activated into before
+          {
+            this.playerSpeed -= 5;                                    //Slow effect template
+            spike.spikeEnabled = false;                               //Disabling the spike
+          }
+      })
     }
 }
