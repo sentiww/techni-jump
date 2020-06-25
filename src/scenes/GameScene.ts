@@ -11,6 +11,19 @@ interface MapSegment {
     animationStarted: boolean;
 }
 
+enum colorMap {
+  red = 0xff0000,
+  orange = 0xff8000,
+  yellow = 0xffff00,
+  purple = 0xff0080,
+  pink = 0xff00ff,
+  green = 0x00ff00,
+  cyan = 0x00ffff,
+  blue = 0x0000ff,
+  lime = 0x00ff80,
+  white = 0xffffff,
+}
+
 const SEGMENT_WIDTH: number = 5;
 const TILE_WIDTH: number = 16;
 const TILE_HEIGHT: number = 16;
@@ -44,7 +57,7 @@ export default class GameScene extends Phaser.Scene
         this.load.spritesheet('tilesetold', 'assets/images/tileset-player.png', { frameWidth: 16, frameHeight: 16, margin: 1, spacing: 2 });
         this.load.spritesheet('tileset', 'assets/images/tileset-extruded.png', { frameWidth: 16, frameHeight: 16, margin: 1, spacing: 2 });
         this.load.tilemapTiledJSON('tilemap', 'assets/tilemaps/tilemap.json');
-        this.load.image('red-gradient', 'assets/images/color-gradient.png');
+        this.load.image('gradient', 'assets/images/gradient.png');
         this.cameras.main.setBackgroundColor('#000000');
     }
 
@@ -185,8 +198,9 @@ export default class GameScene extends Phaser.Scene
 
             if (this.map.length >= 6) {
               let gradientHint =
-                  this.add.image(this.nextSegmentPosition, 0, 'red-gradient').setOrigin(0, 0);
+                  this.add.image(this.nextSegmentPosition, 0, 'gradient').setOrigin(0, 0);
               gradientHint.depth = -1;
+              gradientHint.tint = colorMap[key] ? colorMap[key] : 0xffffff;
               this.gradients.push(gradientHint);
             }
             this.map.push({tilemap:segment, animationStarted: (this.map.length < 6 ? true : false)});
