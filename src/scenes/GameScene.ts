@@ -37,6 +37,7 @@ const MAX_SPEED: number = 250;
 const SPEED_INC_TIME: number = 1000;
 const SPEED_INC_STEP: number = 2;
 const SPEED_INC_TIMEFACTOR: number = -0.002;
+const SPIKE_IDS: number[] = [601,605,609,613,617,621,625,629,633,637];
 
 export default class GameScene extends Phaser.Scene
 {
@@ -107,7 +108,7 @@ export default class GameScene extends Phaser.Scene
             loop: true
         });
         this.generateMap();
-        this.laser = this.physics.add.sprite(-480, 0, 'laser').setOrigin(1, 0).setDepth(2);
+        this.laser = this.physics.add.sprite(-480, 0, 'laser').setOrigin(1, 0).setDepth(3);
         this.anims.create(
         {
           key: '_laser',
@@ -214,19 +215,19 @@ export default class GameScene extends Phaser.Scene
             const segment = this.make.tilemap({ data: this.originSegments.find(segment => segment.key === key).data, tileWidth: TILE_WIDTH, tileHeight: TILE_HEIGHT });
             if (this.map.length < 6) {
               segment.forEachTile(tile => {
-                if(tile.index === 319)
+                if(SPIKE_IDS.includes(tile.index))
                 {
                   tile.destroy();
                   tile.index = -1;
                 }
               })
-              segment.createDynamicLayer('layer', this.originTileset, this.nextSegmentPosition, 0);
+              segment.createDynamicLayer('layer', this.originTileset, this.nextSegmentPosition, 0).setDepth(2);
             } 
             else {
               this.createSpikes(segment);
-              segment.createDynamicLayer('layer', this.originTileset, this.nextSegmentPosition, -280);
+              segment.createDynamicLayer('layer', this.originTileset, this.nextSegmentPosition, -280).setDepth(2);
             }
-            segment.setCollisionBetween(1, 317);
+            segment.setCollisionBetween(1, SPIKE_IDS[0] - 1);
 
             if (this.map.length >= 6) {
               let gradientHint =
@@ -262,7 +263,7 @@ export default class GameScene extends Phaser.Scene
     private createSpikes(seg: Phaser.Tilemaps.Tilemap)                //Creates spikes from segments
     {
       seg.forEachTile(tile => {
-        if(tile.index === 319)
+        if(SPIKE_IDS.includes(tile.index))
         {
           if(Math.random() < this.spikeProbability)                   //Creates based on spikeProbability
             this.spikes.push({spikeTile: tile, spikeEnabled: true});
@@ -293,6 +294,7 @@ export default class GameScene extends Phaser.Scene
           && this.playerSpeed > 20                                    //Checking if speed is above 20
           && spike.spikeEnabled)                                      //Checking if the spike hasn't been activated into before
           {
+            console.log('activated');
             this.playerSpeed -= 5;                                    //Slow effect template
             spike.spikeEnabled = false;                               //Disabling the spike
           }
