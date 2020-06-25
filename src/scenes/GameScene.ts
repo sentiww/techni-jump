@@ -27,16 +27,18 @@ enum colorMap {
   blue = 0x0000ff,
   lime = 0x00ff80,
   white = 0xffffff,
+  start = 0xffffff
 }
 
 const SEGMENT_WIDTH: number = 5;
 const TILE_WIDTH: number = 16;
 const TILE_HEIGHT: number = 16;
-const INITIAL_SPEED: number = 50;
+const INITIAL_SPEED: number = 80;
 const MAX_SPEED: number = 250;
 const SPEED_INC_TIME: number = 1000;
 const SPEED_INC_STEP: number = 2;
 const SPEED_INC_TIMEFACTOR: number = -0.002;
+const SPEED_INC_TIME_AFTER_SLOW: number = 200;
 
 export default class GameScene extends Phaser.Scene
 {
@@ -54,6 +56,8 @@ export default class GameScene extends Phaser.Scene
     private laser: Phaser.GameObjects.Sprite;
     private spikeProbability: number;
     private spikes: SpikeData[] = [];
+    private beFastAgainTimer: Phaser.Time.TimerEvent = null;
+    private playerSlowSpeed: number;
 
     constructor ()
     {
@@ -67,7 +71,9 @@ export default class GameScene extends Phaser.Scene
         this.load.spritesheet('laser', 'assets/images/laser.png', { frameWidth: 480, frameHeight: 270, margin: 0, spacing: 0 });
         this.load.tilemapTiledJSON('tilemap', 'assets/tilemaps/tilemap.json');
         this.load.image('gradient', 'assets/images/gradient.png');
-        this.load.audio('music', 'assets/audio/level-music.ogg');
+        this.load.audio('platform', 'assets/audio/platform.ogg');
+        this.load.audio('jump', 'assets/audio/jump.ogg');
+        this.load.audio('death', 'assets/audio/ded.ogg')
         this.cameras.main.setBackgroundColor('#000000');
     }
 
@@ -79,6 +85,8 @@ export default class GameScene extends Phaser.Scene
         this.nextSegmentPosition = 0;
         this.lastSegmentKey = null;
         this.playerSpeed = INITIAL_SPEED;
+        if (this.beFastAgainTimer !== null) this.beFastAgainTimer.destroy();
+        this.playerSlowSpeed = null;
     }
 
     create()
@@ -121,7 +129,7 @@ export default class GameScene extends Phaser.Scene
         this.cameras.main.startFollow(this.player, true, 1, 1);
         (<Phaser.Physics.Arcade.Body>this.player.body).setVelocityX(this.playerSpeed);
         this.spikeProbability = 0.10;
-        this.sound.play('music');
+        this.sound.stopAll();
         this.sound.volume = 0.6
     }
 
@@ -145,6 +153,11 @@ export default class GameScene extends Phaser.Scene
               ease: 'Quart.easeIn',
               duration: 500 - this.playerSpeed,
               timeScale: 1 + (1 - this.playerSpeedTimer.timeScale),
+              onComplete: () => {
+                this.cameras.main.shake(100 / this.playerSpeedTimer.timeScale, 0.003);
+                //this.cameras.main.flash(50 / this.playerSpeedTimer.timeScale, 255, 255, 255);
+                this.sound.play('platform');
+              },
             });
             let gradientHint = this.gradients.find(sprite => sprite.x === tilemapLayerGameObj.x)
             if (gradientHint) {
@@ -160,15 +173,22 @@ export default class GameScene extends Phaser.Scene
         }
         );
 
-        (<Phaser.Physics.Arcade.Body>this.player.body).setVelocityX(this.playerSpeed);
+        if (this.playerSlowSpeed === null) {
+          (<Phaser.Physics.Arcade.Body>this.player.body)
+              .setVelocityX(this.playerSpeed);
+        } else {
+          (<Phaser.Physics.Arcade.Body>this.player.body)
+              .setVelocityX(this.playerSlowSpeed);
+        }
         (<Phaser.Physics.Arcade.Body>this.laser.body).setVelocityX(this.playerSpeed);
 
         const cursors = this.input.keyboard.createCursorKeys();
 
-        if (cursors.up.isDown)
+        if (cursors.up.isDown) {
           this.checkPlayerJump(true);
-        else
+        } else {
           this.checkPlayerJump(false);
+        }
 
         if (cursors.space.isDown) {
             this.scene.pause();
@@ -176,9 +196,14 @@ export default class GameScene extends Phaser.Scene
         }
 
         if ((<Phaser.Physics.Arcade.Body>this.player.body).y > 280 || (<Phaser.Physics.Arcade.Body>this.player.body).x + 8 <= this.laser.x){
+          this.sound.play('death');
+
           this.scene.pause();
           this.scene.restart();
         }
+
+        console.log("PL SPD:", this.playerSpeed);
+        console.log("PL VEL:", (<Phaser.Physics.Arcade.Body>this.player.body).velocity.x);
     }
 
     private checkPlayerJump(isKeyDown: boolean) {
@@ -187,6 +212,7 @@ export default class GameScene extends Phaser.Scene
       if (isKeyDown) {
         if ((<Phaser.Physics.Arcade.Body>this.player.body).blocked.down) {
             (<Phaser.Physics.Arcade.Body>this.player.body).setVelocityY(-15);
+            this.sound.play('jump');
             this.isPlayerJumping = true;
             timer = this.time.delayedCall(200, () => this.isPlayerJumping = false)
         } else if (this.isPlayerJumping &&
@@ -208,7 +234,7 @@ export default class GameScene extends Phaser.Scene
     {
         while (this.map.length < 12) {
             let next = this.originSegments.map(segment => segment.key);
-            if (this.map.length > 0) 
+            if (this.map.length > 0)
               next = this.originSegments.find(segment => segment.key === this.lastSegmentKey).next;
             const key = next[Math.floor(Math.random() * next.length)];
             const segment = this.make.tilemap({ data: this.originSegments.find(segment => segment.key === key).data, tileWidth: TILE_WIDTH, tileHeight: TILE_HEIGHT });
@@ -221,7 +247,7 @@ export default class GameScene extends Phaser.Scene
                 }
               })
               segment.createDynamicLayer('layer', this.originTileset, this.nextSegmentPosition, 0);
-            } 
+            }
             else {
               this.createSpikes(segment);
               segment.createDynamicLayer('layer', this.originTileset, this.nextSegmentPosition, -280);
@@ -270,7 +296,7 @@ export default class GameScene extends Phaser.Scene
           {
             tile.destroy();
             tile.index = -1;
-          } 
+          }
         }
       })
     }
@@ -293,9 +319,30 @@ export default class GameScene extends Phaser.Scene
           && this.playerSpeed > 20                                    //Checking if speed is above 20
           && spike.spikeEnabled)                                      //Checking if the spike hasn't been activated into before
           {
-            this.playerSpeed -= 5;                                    //Slow effect template
+            console.log('HA!');
+            this.slowPlayer();
+
             spike.spikeEnabled = false;                               //Disabling the spike
           }
       })
+    }
+    private slowPlayer() {
+      if (this.playerSlowSpeed !== null) {
+        this.playerSlowSpeed = this.playerSpeed / 2;
+        return;
+      }
+      this.playerSlowSpeed = this.playerSpeed / 2;
+      this.beFastAgainTimer = this.time.addEvent({
+          delay: SPEED_INC_TIME_AFTER_SLOW,
+          callback: () => {
+              if (this.playerSlowSpeed < this.playerSpeed) {
+                this.playerSlowSpeed = Math.min(this.playerSpeed, this.playerSlowSpeed + SPEED_INC_STEP);
+              } else {
+                this.playerSlowSpeed = null;
+                this.beFastAgainTimer.destroy();
+              }
+          },
+          loop: true
+      });
     }
 }
