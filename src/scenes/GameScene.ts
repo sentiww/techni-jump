@@ -208,7 +208,7 @@ export default class GameScene extends Phaser.Scene
 
   private generatePlayer() {
     this.playerCharacter = 0;
-    this.playerCharacter = 5 * Math.round(Math.random() * 15);
+    this.playerCharacter = 5 * Math.round(Math.random() * 14);
     this.player = this.physics.add.sprite(this.game.canvas.width / 4, this.game.canvas.height / 2, 'player', this.playerCharacter);
     this.anims.create(
       {
