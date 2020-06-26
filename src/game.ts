@@ -1,7 +1,7 @@
 import 'phaser';
-import GameScene from './scenes/GameScene'
-import Menu from './scenes/Menu'
-import Stats from 'stats-js/src/Stats'
+import GameScene from './scenes/GameScene';
+import Menu from './scenes/Menu';
+import Stats from 'stats-js/src/Stats';
 
 let game: Phaser.Game;
 
