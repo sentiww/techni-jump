@@ -67,6 +67,7 @@ export default class GameScene extends Phaser.Scene
     private playerSlowSpeed: number;
     private scoreText: Phaser.GameObjects.Text;
     public score: number;
+    private isDeath: boolean;
 
     constructor ()
     {
@@ -75,15 +76,6 @@ export default class GameScene extends Phaser.Scene
 
     preload()
     {
-        this.load.spritesheet('player', 'assets/images/player.png', { frameWidth: 16, frameHeight: 16, margin: 0, spacing: 0 });
-        this.load.spritesheet('tileset', 'assets/images/tileset-extruded.png', { frameWidth: 16, frameHeight: 16, margin: 1, spacing: 2 });
-        this.load.spritesheet('laser', 'assets/images/laser.png', { frameWidth: 480, frameHeight: 270, margin: 0, spacing: 0 });
-        this.load.tilemapTiledJSON('tilemap', 'assets/tilemaps/tilemapFlat.json');
-        this.load.image('gradient', 'assets/images/gradient.png');
-        this.load.audio('platform', 'assets/audio/platform.ogg');
-        this.load.audio('jump', 'assets/audio/jump.ogg');
-        this.load.audio('death', 'assets/audio/ded.ogg');
-        this.load.audio('music', 'assets/audio/level-music.ogg');
         this.cameras.main.setBackgroundColor('#000000');
     }
 
@@ -99,6 +91,7 @@ export default class GameScene extends Phaser.Scene
         if (this.beFastAgainTimer !== null) this.beFastAgainTimer.destroy();
         this.playerSlowSpeed = null;
         this.score = 0;
+        this.isDeath = false;
     }
 
     create()
@@ -146,7 +139,7 @@ export default class GameScene extends Phaser.Scene
         (<Phaser.Physics.Arcade.Body>this.player.body).setVelocityX(this.playerSpeed);
         this.spikeProbability = 0.10;
         this.sound.stopAll();
-        this.sound.play('music');
+        this.time.delayedCall(100, () => this.sound.play('music'));
         this.sound.volume = 0.6;
         this.scoreText = this.add.text(this.game.canvas.width / 2, 0, '0');
         this.scoreText.setScrollFactor(0);
@@ -213,18 +206,13 @@ export default class GameScene extends Phaser.Scene
           (<Phaser.Physics.Arcade.Body>this.player.body).setVelocityY(500);
         }
 
-        if (cursors.space.isDown) {
-            this.scene.pause();
-            this.spikes = [];
-            this.scene.restart();
-        }
-
-        if ((<Phaser.Physics.Arcade.Body>this.player.body).y > 280 || (<Phaser.Physics.Arcade.Body>this.player.body).x + 8 <= this.laser.x){
-          this.sound.play('death');
-
-          this.scene.pause();
-          this.spikes = [];
-          this.scene.restart();
+        if (((<Phaser.Physics.Arcade.Body>this.player.body).y > 280 ||
+            (<Phaser.Physics.Arcade.Body>this.player.body).x + 8 <= this.laser.x) &&
+            !this.isDeath) {
+          this.isDeath = true;
+          this.physics.pause();
+          let deathsnd = this.sound.play('death');
+          this.sound.get('death').on('complete', () => this.scene.start('Menu', {score: this.score}));
         }
 
         this.spikeCheck();
