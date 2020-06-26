@@ -1,5 +1,6 @@
 import 'phaser';
 import GameScene from './scenes/GameScene'
+import Menu from './scenes/Menu'
 import Stats from 'stats-js/src/Stats'
 
 let game: Phaser.Game;
@@ -19,7 +20,8 @@ class Game extends Phaser.Game
         if (this.ENV !== 'production') {
             this.setupStatsJS();
         }
-        this.scene.add('GameState', GameScene, true);
+        this.scene.add('Menu', Menu, true);
+        this.scene.add('GameState', GameScene, false);
     }
     private setupStatsJS()
     {
