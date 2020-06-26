@@ -62,7 +62,7 @@ window.onload = () => {
             arcade: {
                 gravity: { y: 400 },
             }
-        }
+        },
     });
     resize();
     window.addEventListener('resize', resize, false);

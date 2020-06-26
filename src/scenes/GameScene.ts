@@ -69,6 +69,10 @@ export default class GameScene extends Phaser.Scene
   
     public score: number;
     private isDeath: boolean;
+    private musicIntro: any;
+    private musicLoop: any;
+    private muteMusicButton: Phaser.GameObjects.Image;
+    private muteSFXButton: Phaser.GameObjects.Image;
 
     constructor ()
     {
@@ -140,7 +144,14 @@ export default class GameScene extends Phaser.Scene
         (<Phaser.Physics.Arcade.Body>this.player.body).setVelocityX(this.playerSpeed);
         this.spikeProbability = 0.10;
         this.sound.stopAll();
-        this.time.delayedCall(100, () => this.sound.play('music'));
+        this.time.delayedCall(100, () => {
+          this.musicIntro = this.sound.add('music-intro', {loop: false});
+          this.musicIntro.play({mute:localStorage.getItem('mutedMusic') === 'false'? false : true});
+          this.musicIntro.on('complete', () => {
+            this.musicLoop = this.sound.add('music', {loop: true});
+            this.musicLoop.play({mute:localStorage.getItem('mutedMusic') === 'false'? false : true});
+          })
+        });
         this.sound.volume = 0.6;
         this.scoreSprite.push(this.add.sprite(this.game.canvas.width / 2 - 5, this.cameras.main.y + 4, 'numbers', 0),
                               this.add.sprite(this.game.canvas.width / 2, this.cameras.main.y + 4, 'numbers', 0),
@@ -151,6 +162,45 @@ export default class GameScene extends Phaser.Scene
         });
         let helperUp = this.add.image(this.game.canvas.width / 2 - 128, this.game.canvas.height / 2 - 16, 'helper', 0).setOrigin(0.5);
         let helperDown = this.add.image(this.game.canvas.width / 2 - 128, this.game.canvas.height / 2 + 16, 'helper', 1).setOrigin(0.5);
+
+        this.muteMusicButton = this.add.image(this.game.canvas.width - 32, 8, 'muteBtn', (localStorage.getItem('mutedMusic') === 'false' ? 0 : 1)).setInteractive().setScrollFactor(0).setScale(0.8);
+        this.muteMusicButton.on('pointerover', () => {
+          this.muteMusicButton.setScale(0.7);
+        })
+        this.muteMusicButton.on('pointerout', () => {
+          this.muteMusicButton.setScale(0.8);
+        })
+        this.muteMusicButton.on('pointerdown', () => {
+          if (localStorage.getItem('mutedMusic') === 'true') {
+            localStorage.setItem('mutedMusic', 'false');
+            if (this.musicLoop) this.musicLoop.setMute(false);
+            if (this.musicIntro) this.musicIntro.setMute(false);
+            this.muteMusicButton.setFrame(0);
+          } else {
+            localStorage.setItem('mutedMusic', 'true');
+            if (this.musicLoop) this.musicLoop.setMute(true);
+            if (this.musicIntro) this.musicIntro.setMute(true);
+            this.muteMusicButton.setFrame(1);
+          }
+        })
+
+        this.muteSFXButton = this.add.image(this.game.canvas.width - 8, 8, 'muteBtn', (localStorage.getItem('mutedSFX') === 'false' ? 2 : 3)).setInteractive().setScrollFactor(0).setScale(0.8);
+        this.muteSFXButton.on('pointerover', () => {
+          this.muteSFXButton.setScale(0.7);
+        })
+        this.muteSFXButton.on('pointerout', () => {
+          this.muteSFXButton.setScale(0.8);
+        })
+        this.muteSFXButton.on('pointerdown', () => {
+          if (localStorage.getItem('mutedSFX') === 'true') {
+            localStorage.setItem('mutedSFX', 'false');
+            this.muteSFXButton.setFrame(2);
+          } else {
+            localStorage.setItem('mutedSFX', 'true');
+            this.muteSFXButton.setFrame(3);
+          }
+        })
+      
         this.add.sprite(helperUp.x + 64, helperUp.y, 'up-to-jump');
         this.add.sprite(helperDown.x + 86, helperDown.y, 'down-to-dash');
     }
@@ -211,6 +261,7 @@ export default class GameScene extends Phaser.Scene
         if (cursors.down.isDown && !(<Phaser.Physics.Arcade.Body>this.player.body).blocked.down) {
           this.isPlayerJumping = false;
           (<Phaser.Physics.Arcade.Body>this.player.body).setVelocityY(500);
+          this.sound.play('dash', {mute:localStorage.getItem('mutedSFX') === 'false'? false : true})
         }
 
         if (((<Phaser.Physics.Arcade.Body>this.player.body).y > 280 ||
@@ -218,12 +269,8 @@ export default class GameScene extends Phaser.Scene
             !this.isDeath) {
           this.isDeath = true;
           this.physics.pause();
-          let deathsnd = this.sound.play('death');
-          this.sound.get('death').on('complete', () => {
-            this.scoreSprite.forEach(el => el.destroy());
-            this.scoreSprite = [];
-            this.scene.start('Menu', {score: this.score})
-          });
+          let deathsnd = this.sound.play('death', {mute:localStorage.getItem('mutedSFX') === 'false'? false : true});
+          this.sound.get('death').on('complete', () => this.scene.start('Menu', {score: this.score}));
         }
 
         this.removeSpikes();
@@ -283,7 +330,7 @@ export default class GameScene extends Phaser.Scene
           timeScale: 1 + (1 - this.playerSpeedTimer.timeScale),
           onComplete: () => {
             this.cameras.main.shake(100 / this.playerSpeedTimer.timeScale, 0.003);
-            this.sound.play('platform');
+            this.sound.play('platform', {mute:localStorage.getItem('mutedSFX') === 'false'? false : true});
           },
         });
         let gradientHint = this.gradients.find(sprite => sprite.x === tilemapLayerGameObj.x);
@@ -307,7 +354,7 @@ export default class GameScene extends Phaser.Scene
       if (isKeyDown && !(<Phaser.Physics.Arcade.Body>this.player.body).blocked.up) {
         if ((<Phaser.Physics.Arcade.Body>this.player.body).blocked.down) {
             (<Phaser.Physics.Arcade.Body>this.player.body).setVelocityY(-125);
-            this.sound.play('jump');
+            this.sound.play('jump', {mute:localStorage.getItem('mutedSFX') === 'false'? false : true});
             this.isPlayerJumping = true;
             timer = this.time.delayedCall(250, () => this.isPlayerJumping = false)
         } else if (this.isPlayerJumping &&
@@ -417,6 +464,7 @@ export default class GameScene extends Phaser.Scene
           && spike.spikeEnabled)                                      //Checking if the spike hasn't been activated into before
           {
             this.slowPlayer();
+            this.sound.play('spikes', {mute:localStorage.getItem('mutedSFX') === 'false'? false : true})
             spike.spikeEnabled = false;                               //Disabling the spike
           }
       })
