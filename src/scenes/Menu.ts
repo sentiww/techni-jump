@@ -49,7 +49,7 @@ export default class Menu extends Phaser.Scene {
       this.load.spritesheet('tileset', 'assets/images/tileset-extruded.png', { frameWidth: 16, frameHeight: 16, margin: 1, spacing: 2 });
       this.load.spritesheet('laser', 'assets/images/laser.png', { frameWidth: 480, frameHeight: 270, margin: 0, spacing: 0 });
       this.load.spritesheet('numbers', 'assets/images/nums.png', { frameWidth: 5, frameHeight: 7, margin: 0, spacing: 0 });
-      this.load.tilemapTiledJSON('tilemap', 'assets/tilemaps/tilemap.json');
+      this.load.tilemapTiledJSON('tilemap', 'assets/tilemaps/tilemapFlat.json');
       this.load.image('gradient', 'assets/images/gradient.png');
       this.load.image('logo', 'assets/images/techni.png');
       this.load.image('startBtn', 'assets/images/start.png');

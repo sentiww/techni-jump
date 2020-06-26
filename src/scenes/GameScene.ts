@@ -141,8 +141,13 @@ export default class GameScene extends Phaser.Scene
         this.sound.stopAll();
         this.time.delayedCall(100, () => this.sound.play('music'));
         this.sound.volume = 0.6;
-        //this.scoreSprite.push(this.add.sprite(this.game.canvas.width / 2, this.cameras.main.y + 32, 'numbers', 0));
-        this.scoreSprite.forEach(x => x.setScrollFactor(1));
+        this.scoreSprite.push(this.add.sprite(this.game.canvas.width / 2 - 5, this.cameras.main.y + 32, 'numbers', 0),
+                              this.add.sprite(this.game.canvas.width / 2, this.cameras.main.y + 32, 'numbers', 0),
+                              this.add.sprite(this.game.canvas.width / 2 + 5, this.cameras.main.y + 32, 'numbers', 0));
+        this.scoreSprite.forEach(element => {
+          element.scrollFactorX = 0;
+          element.setDepth(5);
+        });
         let helperUp = this.add.image(this.game.canvas.width / 2 - 128, this.game.canvas.height / 2 - 16, 'helper', 0).setOrigin(0.5);
         let helperDown = this.add.image(this.game.canvas.width / 2 - 128, this.game.canvas.height / 2 + 16, 'helper', 1).setOrigin(0.5);
         this.add.sprite(helperUp.x + 64, helperUp.y, 'up-to-jump');
@@ -221,16 +226,27 @@ export default class GameScene extends Phaser.Scene
         this.spikeCheck();
         this.score =
             Math.ceil(Math.max(0, (<Phaser.Physics.Arcade.Body>this.player.body).x - 480) / 80);
+
+        this.setScore();
     }
 
     private setScore()
     {
-      this.scoreSprite.forEach(scr => scr.destroy())
-      this.scoreSprite = [];
-      this.score.toString().split('').forEach((num, index) => {
-        this.scoreSprite.push(this.add.sprite(this.game.canvas.width / 2 + 5 * index, this.game.canvas.height / 2, 'numbers', parseInt(num)).setDepth(10));
-        console.log('a');
-      })
+      if(this.score.toString().split('').length === 1)
+      {
+        this.scoreSprite[2].setFrame(parseInt(this.score.toString().split('')[0]));
+      }
+      else if(this.score.toString().split('').length === 2)
+      {
+        this.scoreSprite[2].setFrame(parseInt(this.score.toString().split('')[1]));
+        this.scoreSprite[1].setFrame(parseInt(this.score.toString().split('')[0]));
+      }
+      else
+      {
+        this.scoreSprite[2].setFrame(parseInt(this.score.toString().split('')[2]));
+        this.scoreSprite[1].setFrame(parseInt(this.score.toString().split('')[1]));
+        this.scoreSprite[0].setFrame(parseInt(this.score.toString().split('')[0]));
+      }
     }
 
     private checkPlayerJump(isKeyDown: boolean) {
@@ -260,7 +276,6 @@ export default class GameScene extends Phaser.Scene
     private generateMap(isStart = false)
     {
         while (this.map.length < 12) {
-          this.setScore();
             let next = this.originSegments.map(segment => segment.key);
             if (this.map.length > 0)
               next = this.originSegments.find(segment => segment.key === this.lastSegmentKey).next;
