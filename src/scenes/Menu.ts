@@ -92,14 +92,13 @@ export default class Menu extends Phaser.Scene {
     if (this.highscore !== -1) {
       this.add.sprite((this.game.canvas.width / 2) - 30, this.game.canvas.height / 2, 'highscore').setOrigin(0.5);
       this.highscore.toString().split('').forEach((number, index) => {
-        this.add.sprite((this.game.canvas.width / 2) - 34 + 5 * index, this.game.canvas.height / 2 + 8, 'numbers', parseInt(number));
+        this.add.sprite((this.game.canvas.width / 2) - 32 + 5 * index, this.game.canvas.height / 2 + 8, 'numbers', parseInt(number));
       })
     }
 
     if (this.score !== -1) {
-      this.add.sprite((this.game.canvas.width / 2) + 30, this.game.canvas.height / 2, 'last').setOrigin(0.5);
       this.score.toString().split('').forEach((number, index) => {
-        this.add.sprite((this.game.canvas.width / 2) + 30 + 5 * index, this.game.canvas.height / 2 + 8, 'numbers', parseInt(number));
+        this.add.sprite((this.game.canvas.width / 2) + 30 + 10 * index, this.game.canvas.height / 2 + 4, 'numbers', parseInt(number)).setScale(2.2);
       })
     }
 
