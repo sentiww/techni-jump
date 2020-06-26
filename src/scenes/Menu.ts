@@ -60,6 +60,7 @@ export default class Menu extends Phaser.Scene {
       this.load.image('up-to-jump', 'assets/images/up-to-jump.png');
       this.load.image('down-to-dash', 'assets/images/down-to-dash.png');
       this.load.image('highscore', 'assets/images/highscore.png');
+      this.load.image('last', 'assets/images/last.png');
       this.load.audio('platform', 'assets/audio/platform.ogg');
       this.load.audio('jump', 'assets/audio/jump.ogg');
       this.load.audio('dash', 'assets/audio/dash.ogg');
@@ -89,15 +90,16 @@ export default class Menu extends Phaser.Scene {
     this.sound.volume = 0.6;
 
     if (this.highscore !== -1) {
-      this.add.sprite(this.game.canvas.width / 2, 48, 'highscore').setOrigin(0.5);
+      this.add.sprite((this.game.canvas.width / 2) - 30, this.game.canvas.height / 2, 'highscore').setOrigin(0.5);
       this.highscore.toString().split('').forEach((number, index) => {
-        this.add.sprite(this.game.canvas.width / 2 + 5 * index, 64, 'numbers', parseInt(number));
+        this.add.sprite((this.game.canvas.width / 2) - 34 + 5 * index, this.game.canvas.height / 2 + 8, 'numbers', parseInt(number));
       })
     }
 
     if (this.score !== -1) {
+      this.add.sprite((this.game.canvas.width / 2) + 30, this.game.canvas.height / 2, 'last').setOrigin(0.5);
       this.score.toString().split('').forEach((number, index) => {
-        this.add.sprite(this.game.canvas.width / 2 + 5 * index, this.game.canvas.height / 2, 'numbers', parseInt(number));
+        this.add.sprite((this.game.canvas.width / 2) + 30 + 5 * index, this.game.canvas.height / 2 + 8, 'numbers', parseInt(number));
       })
     }
 
