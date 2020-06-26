@@ -242,7 +242,7 @@ export default class GameScene extends Phaser.Scene
               next = ['start'];
             const key = next[Math.floor(Math.random() * next.length)];
             const segment = this.make.tilemap({ data: this.originSegments.find(segment => segment.key === key).data, tileWidth: TILE_WIDTH, tileHeight: TILE_HEIGHT });
-            if (isStart && this.map.length < 6) {
+            if (isStart && this.map.length < 6) { 
               segment.forEachTile(tile => {
                 if(SPIKE_IDS.includes(tile.index))
                 {
