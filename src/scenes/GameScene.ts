@@ -41,7 +41,6 @@ const SPEED_INC_TIMEFACTOR: number = -0.002;
 const SPIKE_IDS: number[] = [581,585,589,593,597,601,605,609,613,617,621,625,629,633,637];
 const SPEED_INC_TIME_AFTER_SLOW: number = 200;
 
-
 export default class GameScene extends Phaser.Scene
 {
     private originTilemap: Phaser.Tilemaps.Tilemap;
@@ -60,6 +59,7 @@ export default class GameScene extends Phaser.Scene
     private spikes: SpikeData[] = [];
     private beFastAgainTimer: Phaser.Time.TimerEvent = null;
     private playerSlowSpeed: number;
+    private playerCharacter: number;
 
     constructor ()
     {
@@ -105,7 +105,7 @@ export default class GameScene extends Phaser.Scene
                     data: layer.data.map(tiles => tiles.map(tile => tile.index)),
                 };
             });
-        this.player = this.physics.add.sprite(this.game.canvas.width / 4, this.game.canvas.height / 2, 'player', Math.floor(Math.random() * 15));
+        this.generatePlayer();
         this.player.setDepth(1);
         this.playerSpeedTimer = this.time.addEvent({
             delay: SPEED_INC_TIME,
@@ -137,42 +137,42 @@ export default class GameScene extends Phaser.Scene
         this.sound.volume = 0.6;
     }
 
+  private generatePlayer() {
+    this.playerCharacter = 5 * Math.round(Math.random() * 15);
+    this.player = this.physics.add.sprite(this.game.canvas.width / 4, this.game.canvas.height / 2, 'player', this.playerCharacter);
+    this.anims.create(
+      {
+        key: '_running',
+        frames: this.anims.generateFrameNumbers('player', { start: this.playerCharacter, end: this.playerCharacter }),
+      });
+    this.anims.create(
+      {
+        key: '_jumping',
+        frames: this.anims.generateFrameNumbers('player', { start: this.playerCharacter + 1, end: this.playerCharacter + 1 }),
+      });
+    this.anims.create(
+      {
+        key: '_falling',
+        frames: this.anims.generateFrameNumbers('player', { start: this.playerCharacter + 2, end: this.playerCharacter + 2 }),
+      });
+    this.anims.create(
+      {
+        key: '_laserinframe',
+        frames: this.anims.generateFrameNumbers('player', { start: this.playerCharacter + 3, end: this.playerCharacter + 3 }),
+      });
+    this.anims.create(
+      {
+        key: '_laserclose',
+        frames: this.anims.generateFrameNumbers('player', { start: this.playerCharacter + 4, end: this.playerCharacter + 4 }),
+      });
+  }
+
     update()
     {
         this.cleanMap();
         this.generateMap();
-        this.map.forEach(mapsegment => {
-          let tilemap = mapsegment.tilemap
-          let tilemapLayerGameObj = tilemap.getLayer('layer').tilemapLayer;
-          this.physics.collide(this.player, tilemapLayerGameObj);
-
-          if (tilemapLayerGameObj.x - this.player.x < 200 &&
-              mapsegment.animationStarted === false) {
-            mapsegment.animationStarted = true;
-            this.tweens.add({
-              targets: tilemapLayerGameObj,
-              y: 0,
-              ease: 'Quart.easeIn',
-              duration: 500 - this.playerSpeed,
-              timeScale: 1 + (1 - this.playerSpeedTimer.timeScale),
-              onComplete: () => {
-                this.cameras.main.shake(100 / this.playerSpeedTimer.timeScale, 0.003);
-                this.sound.play('platform');
-              },
-            });
-            let gradientHint = this.gradients.find(sprite => sprite.x === tilemapLayerGameObj.x)
-            if (gradientHint) {
-              this.tweens.add({
-                targets: gradientHint,
-                alpha: 0,
-                ease: 'Expo.easeInOut',
-                duration: 600,
-                delay: 400,
-              })
-            }
-          }
-        }
-        );
+        this.platformFall();
+        this.playerAnims();
 
         if (this.playerSlowSpeed === null) {
           (<Phaser.Physics.Arcade.Body>this.player.body)
@@ -182,7 +182,6 @@ export default class GameScene extends Phaser.Scene
               .setVelocityX(this.playerSlowSpeed);
         }
         (<Phaser.Physics.Arcade.Body>this.laser.body).setVelocityX(this.playerSpeed);
-
 
         const cursors = this.input.keyboard.createCursorKeys();
 
@@ -209,6 +208,54 @@ export default class GameScene extends Phaser.Scene
         this.spikeCheck();
         this.removeSpikes();
     }
+
+  private playerAnims() {
+    if (this.laser.x >= this.player.x - 60)
+      this.player.anims.play('_laserclose');
+    else if (this.laser.x >= this.player.x - 240)
+      this.player.anims.play('_laserinframe');
+    else if ((<Phaser.Physics.Arcade.Body>this.player.body).velocity.y > 0)
+      this.player.anims.play('_falling');
+    else if ((<Phaser.Physics.Arcade.Body>this.player.body).velocity.y < 0)
+      this.player.anims.play('_jumping');
+    else
+      this.player.anims.play('_running');
+  }
+
+  private platformFall() {
+    this.map.forEach(mapsegment => {
+      let tilemap = mapsegment.tilemap;
+      let tilemapLayerGameObj = tilemap.getLayer('layer').tilemapLayer;
+      this.physics.collide(this.player, tilemapLayerGameObj);
+
+      if (tilemapLayerGameObj.x - this.player.x < 200 &&
+        mapsegment.animationStarted === false) {
+        mapsegment.animationStarted = true;
+        this.tweens.add({
+          targets: tilemapLayerGameObj,
+          y: 0,
+          ease: 'Quart.easeIn',
+          duration: 500 - this.playerSpeed,
+          timeScale: 1 + (1 - this.playerSpeedTimer.timeScale),
+          onComplete: () => {
+            this.cameras.main.shake(100 / this.playerSpeedTimer.timeScale, 0.003);
+            this.sound.play('platform');
+          },
+        });
+        let gradientHint = this.gradients.find(sprite => sprite.x === tilemapLayerGameObj.x);
+        if (gradientHint) {
+          this.tweens.add({
+            targets: gradientHint,
+            alpha: 0,
+            ease: 'Expo.easeInOut',
+            duration: 600,
+            delay: 400,
+          });
+        }
+      }
+    }
+    );
+  }
 
     private checkPlayerJump(isKeyDown: boolean) {
       let yVel: number = (<Phaser.Physics.Arcade.Body>this.player.body).velocity.y;
