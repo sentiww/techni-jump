@@ -38,7 +38,7 @@ const MAX_SPEED: number = 250;
 const SPEED_INC_TIME: number = 1000;
 const SPEED_INC_STEP: number = 2;
 const SPEED_INC_TIMEFACTOR: number = -0.002;
-const SPIKE_IDS: number[] = [601,605,609,613,617,621,625,629,633,637];
+const SPIKE_IDS: number[] = [581,585,589,593,597,601,605,609,613,617,621,625,629,633,637];
 const SPEED_INC_TIME_AFTER_SLOW: number = 200;
 
 
@@ -104,7 +104,7 @@ export default class GameScene extends Phaser.Scene
                     data: layer.data.map(tiles => tiles.map(tile => tile.index)),
                 };
             });
-        this.player = this.physics.add.sprite(this.game.canvas.width / 4, this.game.canvas.height / 2, 'player', Math.floor(Math.random() * 3));
+        this.player = this.physics.add.sprite(this.game.canvas.width / 4, this.game.canvas.height / 2, 'player', Math.floor(Math.random() * 15));
         this.player.setDepth(1);
         this.playerSpeedTimer = this.time.addEvent({
             delay: SPEED_INC_TIME,

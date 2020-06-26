@@ -3,7 +3,8 @@
     {
      "export":
         {
-         "format":"json"
+         "format":"json",
+         "target":"tilemap.json"
         }
     },
  "height":17,
@@ -11,7 +12,7 @@
  "layers":[
         {
          "compression":"",
-         "data":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIwAAACKAAAAigAAAIoAAACMAAAAoAAAAIACAACAAgAAgAIAAKAAAACgAAAAgAIAAIACAACAAgAAoAAAAKAAAACAAgAAgAIAAIACAACgAAAAoAAAAIACAACAAgAAgAIAAKAAAACgAAAAgAIAAIACAACAAgAAoAAAAKAAAACAAgAAgAIAAIACAACgAAAAoAAAAIACAACAAgAAgAIAAKAAAACgAAAAgAIAAIACAACAAgAAoAAAAA==",
+         "data":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIoAAACKAAAAigAAAIoAAACKAAAAgAIAAIACAACAAgAAgAIAAIACAACAAgAAgAIAAIACAACAAgAAgAIAAIACAACAAgAAgAIAAIACAACAAgAAgAIAAIACAACAAgAAgAIAAIACAACAAgAAgAIAAIACAACAAgAAgAIAAA==",
          "encoding":"base64",
          "height":17,
          "id":12,
@@ -21,10 +22,30 @@
                 {
                  "name":"next",
                  "type":"string",
+                 "value":"startend"
+                }],
+         "type":"tilelayer",
+         "visible":false,
+         "width":5,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "compression":"",
+         "data":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIoAAACKAAAAigAAAIoAAACLAAAAgAIAAIACAACAAgAAgAIAAJ8AAACAAgAAgAIAAIACAACAAgAAnwAAAIACAACAAgAAgAIAAIACAACfAAAAgAIAAIACAACAAgAAgAIAAJ8AAACAAgAAgAIAAIACAACAAgAAnwAAAA==",
+         "encoding":"base64",
+         "height":17,
+         "id":18,
+         "name":"startend",
+         "opacity":1,
+         "properties":[
+                {
+                 "name":"next",
+                 "type":"string",
                  "value":"red,orange,yellow,purple,pink,green,cyan,blue,lime,white"
                 }],
          "type":"tilelayer",
-         "visible":true,
+         "visible":false,
          "width":5,
          "x":0,
          "y":0
@@ -41,7 +62,7 @@
                 {
                  "name":"next",
                  "type":"string",
-                 "value":"orange,yellow,purple,pink,green,cyan,blue,lime,white"
+                 "value":"orange,yellow,purple,pink,green,cyan,blue,lime,white,pacific,kingfisher,amber,fuego,salem"
                 }],
          "type":"tilelayer",
          "visible":false,
@@ -61,7 +82,7 @@
                 {
                  "name":"next",
                  "type":"string",
-                 "value":"red,yellow,pink,green,cyan,blue,lime"
+                 "value":"red,yellow,pink,green,cyan,blue,lime,pacific,kingfisher,amber,fuego,salem"
                 }],
          "type":"tilelayer",
          "visible":false,
@@ -81,7 +102,7 @@
                 {
                  "name":"next",
                  "type":"string",
-                 "value":"red,orange,purple,pink,cyan,blue,lime"
+                 "value":"red,orange,purple,pink,cyan,blue,lime,pacific,kingfisher,amber,fuego,salem"
                 }],
          "type":"tilelayer",
          "visible":false,
@@ -91,7 +112,7 @@
         }, 
         {
          "compression":"",
-         "data":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGUCAABlAgAAZQIAAGUCAAAAAAAADQAAAA4AAAAOAAAADwAAAAAAAAA1AAAANgAAADYAAAA3AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGUCAABlAgAAAAAAAAAAAABlAgAADQAAAA8AAABlAgAAAAAAAA0AAABdAAAAYAAAAEsAAAAAAAAANQAAADYAAAA3AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAJAAAAAAAAAAQAAAAEAAAAAAAAAAkAAAAAAAAACQAAAAkAAAAAAAAACQAAAAAAAAAOAAAAA==",
+         "data":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGUCAABlAgAAZQIAAGUCAAAAAAAADQAAAA4AAAAOAAAADwAAAAAAAAA1AAAANgAAADYAAAA3AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGUCAABlAgAAAAAAAAAAAABlAgAADQAAAA8AAABlAgAAAAAAAA0AAABdAAAAYAAAAEsAAAAAAAAANQAAADYAAAA3AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAJAAAAAAAAAAQAAAAEAAAAAAAAAAkAAAAAAAAACQAAAAkAAAAAAAAACQAAAAAAAAAJAAAAA==",
          "encoding":"base64",
          "height":17,
          "id":4,
@@ -101,7 +122,7 @@
                 {
                  "name":"next",
                  "type":"string",
-                 "value":"red,orange,yellow,pink,green,cyan,blue,lime,white"
+                 "value":"red,orange,yellow,pink,green,cyan,blue,lime,white,pacific,kingfisher,amber,fuego,salem"
                 }],
          "type":"tilelayer",
          "visible":false,
@@ -121,7 +142,7 @@
                 {
                  "name":"next",
                  "type":"string",
-                 "value":"red,yellow,purple,green,cyan,blue,lime,white"
+                 "value":"red,yellow,purple,green,cyan,blue,lime,white,pacific,kingfisher,amber,fuego,salem"
                 }],
          "type":"tilelayer",
          "visible":false,
@@ -141,7 +162,7 @@
                 {
                  "name":"next",
                  "type":"string",
-                 "value":"orange,yellow,purple,pink,cyan,blue"
+                 "value":"orange,yellow,purple,pink,cyan,blue,pacific,kingfisher,amber,fuego,salem"
                 }],
          "type":"tilelayer",
          "visible":false,
@@ -161,7 +182,7 @@
                 {
                  "name":"next",
                  "type":"string",
-                 "value":"red,orange,yellow,purple,pink,green,blue,lime,white"
+                 "value":"red,orange,yellow,purple,pink,green,blue,lime,white,pacific,kingfisher,amber,fuego,salem"
                 }],
          "type":"tilelayer",
          "visible":false,
@@ -181,7 +202,7 @@
                 {
                  "name":"next",
                  "type":"string",
-                 "value":"red,orange,yellow,purple,pink,green,cyan,lime,white"
+                 "value":"red,orange,yellow,purple,pink,green,cyan,lime,white,pacific,kingfisher,amber,fuego,salem"
                 }],
          "type":"tilelayer",
          "visible":false,
@@ -201,7 +222,7 @@
                 {
                  "name":"next",
                  "type":"string",
-                 "value":"red,orange,yellow,purple,pink,green,cyan,blue,white"
+                 "value":"red,orange,yellow,purple,pink,green,cyan,blue,white,pacific,kingfisher,amber,fuego,salem"
                 }],
          "type":"tilelayer",
          "visible":false,
@@ -221,7 +242,107 @@
                 {
                  "name":"next",
                  "type":"string",
-                 "value":"red,orange,yellow,purple,pink,green,cyan,blue,lime"
+                 "value":"red,orange,yellow,purple,pink,green,cyan,blue,lime,pacific,kingfisher,amber,fuego,salem"
+                }],
+         "type":"tilelayer",
+         "visible":false,
+         "width":5,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "compression":"",
+         "data":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD0AAAAAAAAAPQAAAAAAAAAAAAAAAgBAAAAAAAACAEAAAAAAAAAAAAAHAEAAAAAAAAcAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA9AAAAAAAAAAAAAAAAAAAAAAAAAAIAQAAAAAAAAAAAAAAAAAAAAAAABwBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD0AAAAAAAAAPQAAAAAAAAAAAAAAAgBAAAAAAAACAEAAAAAAAAAAAAACAEAAAAAAAAIAQAAAAAAAA==",
+         "encoding":"base64",
+         "height":17,
+         "id":13,
+         "name":"pacific",
+         "opacity":1,
+         "properties":[
+                {
+                 "name":"next",
+                 "type":"string",
+                 "value":"red,orange,yellow,purple,pink,green,cyan,blue,lime,white,kingfisher,amber,fuego,salem"
+                }],
+         "type":"tilelayer",
+         "visible":false,
+         "width":5,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "compression":"",
+         "data":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEkCAABJAgAASQIAAAAAAAAAAAAA9QAAAPYAAAD3AAAAAAAAAAAAAAAdAQAAHgEAAB8BAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASQIAAEkCAABJAgAAAAAAAAAAAAD1AAAA9gAAAPcAAAAAAAAAAAAAAB0BAAAeAQAAHwEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+         "encoding":"base64",
+         "height":17,
+         "id":14,
+         "name":"kingfisher",
+         "opacity":1,
+         "properties":[
+                {
+                 "name":"next",
+                 "type":"string",
+                 "value":"red,orange,yellow,purple,pink,green,cyan,blue,lime,white,pacific,amber,fuego,salem"
+                }],
+         "type":"tilelayer",
+         "visible":false,
+         "width":5,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "compression":"",
+         "data":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAATQIAAE0CAABNAgAAAAAAAAAAAAA1AQAANgEAADcBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABNAgAATQIAAE0CAAAAAAAAAAAAAPkAAAD6AAAA+wAAAAAAAAAAAAAADQEAAIACAAAPAQAAAAAAAAAAAAANAQAAgAIAAA8BAAAAAAAAAAAAAA0BAACAAgAADwEAAAAAAAAAAAAADQEAAIACAAAPAQAAAAAAAAAAAAANAQAAgAIAAA8BAAAAAAAAAAAAACEBAAAiAQAAIwEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAE0CAABNAgAATQIAAAAAAAAAAAAA+QAAAPoAAAD7AAAAAAAAAA==",
+         "encoding":"base64",
+         "height":17,
+         "id":15,
+         "name":"amber",
+         "opacity":1,
+         "properties":[
+                {
+                 "name":"next",
+                 "type":"string",
+                 "value":"red,orange,yellow,purple,pink,green,cyan,blue,lime,white,pacific,kingfisher,fuego,salem"
+                }],
+         "type":"tilelayer",
+         "visible":false,
+         "width":5,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "compression":"",
+         "data":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFECAABRAgAAUQIAAAAAAAAAAAAAOQEAADoBAAA7AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABRAgAAUQIAAAAAAAAAAAAAAAAAAP0AAAD\/AAAAAAAAAAAAAAAAAAAAEQEAABMBAAAAAAAAAAAAAFECAAARAQAAEwEAAAAAAAAAAAAA\/QAAAGEBAAATAQAAAAAAAAAAAAAlAQAAJgEAACcBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+         "encoding":"base64",
+         "height":17,
+         "id":16,
+         "name":"fuego",
+         "opacity":1,
+         "properties":[
+                {
+                 "name":"next",
+                 "type":"string",
+                 "value":"red,orange,yellow,purple,pink,green,cyan,blue,lime,white,pacific,kingfisher,amber,salem"
+                }],
+         "type":"tilelayer",
+         "visible":false,
+         "width":5,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "compression":"",
+         "data":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVQIAAFUCAABVAgAAAAAAAAAAAAA9AQAAPgEAAD8BAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABVAgAAVQIAAFUCAAAAAAAAAAAAAD0BAAA+AQAAPwEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFUCAABVAgAAVQIAAAAAAAAAAAAAPQEAAD4BAAA\/AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVQIAAFUCAABVAgAAAAAAAAAAAAA9AQAAPgEAAD8BAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+         "encoding":"base64",
+         "height":17,
+         "id":17,
+         "name":"salem",
+         "opacity":1,
+         "properties":[
+                {
+                 "name":"next",
+                 "type":"string",
+                 "value":"red,orange,yellow,purple,pink,green,cyan,blue,lime,white,pacific,kingfisher,amber,fuego"
                 }],
          "type":"tilelayer",
          "visible":false,
@@ -229,7 +350,7 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":13,
+ "nextlayerid":19,
  "nextobjectid":6,
  "orientation":"orthogonal",
  "renderorder":"right-down",
@@ -239,7 +360,7 @@
         {
          "columns":20,
          "firstgid":1,
-         "image":"..\/..\/..\/..\/pixelAssets\/tileset.png",
+         "image":"..\/images\/tileset.png",
          "imageheight":512,
          "imagewidth":320,
          "margin":0,
