@@ -24,7 +24,6 @@ export default class Menu extends Phaser.Scene {
   private menuTheme: any;
   private score: number = 0;
   private highscore: number;
-  private themeBeatCounter: Phaser.Time.TimerEvent;
   private themeBeatColorIndex: number;
   private muteMusicButton: Phaser.GameObjects.Image;
   private muteSFXButton: Phaser.GameObjects.Image;
@@ -36,9 +35,13 @@ export default class Menu extends Phaser.Scene {
 
   init(data) {
     this.score = data.score || -1;
-    this.highscore = -1
+    this.highscore = Number.parseInt(localStorage.getItem('highscore')) || -1;
     this.highscore = Math.max(this.highscore, this.score);
+    if (this.highscore !== -1) localStorage.setItem('highscore', this.highscore.toString());
     this.themeBeatColorIndex = 0;
+
+    if (localStorage.getItem('mutedMusic') === null) localStorage.setItem('mutedMusic', 'false');
+    if (localStorage.getItem('mutedSFX') === null) localStorage.setItem('mutedSFX', 'false');
   }
 
   preload()
@@ -48,24 +51,24 @@ export default class Menu extends Phaser.Scene {
       this.load.spritesheet('muteBtn', 'assets/images/mute-buttons.png', { frameWidth: 16, frameHeight: 16, margin: 0, spacing: 0 });
       this.load.spritesheet('tileset', 'assets/images/tileset-extruded.png', { frameWidth: 16, frameHeight: 16, margin: 1, spacing: 2 });
       this.load.spritesheet('laser', 'assets/images/laser.png', { frameWidth: 480, frameHeight: 270, margin: 0, spacing: 0 });
-      this.load.tilemapTiledJSON('tilemap', 'assets/tilemaps/tilemap.json');
+      this.load.tilemapTiledJSON('tilemap', 'assets/tilemaps/tilemapFlat.json');
       this.load.image('gradient', 'assets/images/gradient.png');
       this.load.image('logo', 'assets/images/techni.png');
       this.load.image('startBtn', 'assets/images/start.png');
       this.load.audio('platform', 'assets/audio/platform.ogg');
       this.load.audio('jump', 'assets/audio/jump.ogg');
+      this.load.audio('dash', 'assets/audio/dash.ogg');
+      this.load.audio('spikes', 'assets/audio/spike.ogg');
       this.load.audio('death', 'assets/audio/ded.ogg');
-      this.load.audio('music', 'assets/audio/level-music.ogg');
+      this.load.audio('music', 'assets/audio/theme.ogg');
+      this.load.audio('music-intro', 'assets/audio/theme-intro.ogg');
       this.load.audio('menu-theme', 'assets/audio/menu-theme.ogg');
       this.cameras.main.setBackgroundColor('#000000');
   }
 
   create() {
     this.logo = this.add.image(this.game.canvas.width / 2, 16, 'logo').setOrigin(0.5, 0);
-    this.sound.stopAll();
-    this.menuTheme = this.sound.add('menu-theme', {loop: true});
-    this.menuTheme.play();
-    this.themeBeatCounter = this.time.addEvent({
+    this.time.addEvent({
       delay: 800,
       callback: () => {
         if (++this.themeBeatColorIndex >= COLORS.length)
@@ -75,6 +78,10 @@ export default class Menu extends Phaser.Scene {
       },
       loop: true,
     });
+    this.sound.stopAll();
+    this.menuTheme = this.sound.add('menu-theme', {loop: true});
+    this.menuTheme.play({mute: localStorage.getItem('mutedMusic') === 'true' ? true : false});
+    this.sound.volume = 0.6;
 
     if (this.highscore !== -1) {
       this.add.text(this.game.canvas.width / 2, 48, 'Highscore:').setOrigin(0.5);
@@ -97,8 +104,41 @@ export default class Menu extends Phaser.Scene {
       this.scene.start('GameScene');
     })
 
-    this.add.image(this.game.canvas.width / 2 - 16, this.game.canvas.height - 8, 'muteBtn', 0);
-    this.add.image(this.game.canvas.width / 2 + 16, this.game.canvas.height - 8, 'muteBtn', 2);
+    this.muteMusicButton = this.add.image(this.game.canvas.width / 2 - 16, this.game.canvas.height - 8, 'muteBtn', (localStorage.getItem('mutedMusic') === 'false' ? 0 : 1)).setInteractive();
+    this.muteMusicButton.on('pointerover', () => {
+      this.muteMusicButton.setScale(0.9);
+    })
+    this.muteMusicButton.on('pointerout', () => {
+      this.muteMusicButton.setScale(1);
+    })
+    this.muteMusicButton.on('pointerdown', () => {
+      if (localStorage.getItem('mutedMusic') === 'true') {
+        localStorage.setItem('mutedMusic', 'false');
+        this.menuTheme.setMute(false);
+        this.muteMusicButton.setFrame(0);
+      } else {
+        localStorage.setItem('mutedMusic', 'true');
+        this.menuTheme.setMute(true);
+        this.muteMusicButton.setFrame(1);
+      }
+    })
+
+    this.muteSFXButton = this.add.image(this.game.canvas.width / 2 + 16, this.game.canvas.height - 8, 'muteBtn', (localStorage.getItem('mutedSFX') === 'false' ? 2 : 3)).setInteractive();
+    this.muteSFXButton.on('pointerover', () => {
+      this.muteSFXButton.setScale(0.9);
+    })
+    this.muteSFXButton.on('pointerout', () => {
+      this.muteSFXButton.setScale(1);
+    })
+    this.muteSFXButton.on('pointerdown', () => {
+      if (localStorage.getItem('mutedSFX') === 'true') {
+        localStorage.setItem('mutedSFX', 'false');
+        this.muteSFXButton.setFrame(2);
+      } else {
+        localStorage.setItem('mutedSFX', 'true');
+        this.muteSFXButton.setFrame(3);
+      }
+    })
   }
 
   update() {
