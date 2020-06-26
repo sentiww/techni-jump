@@ -142,17 +142,17 @@ export default class GameScene extends Phaser.Scene
         this.sound.stopAll();
         this.time.delayedCall(100, () => this.sound.play('music'));
         this.sound.volume = 0.6;
-        this.scoreSprite.push(this.add.sprite(this.game.canvas.width / 2 - 5, this.cameras.main.y + 32, 'numbers', 0),
-                              this.add.sprite(this.game.canvas.width / 2, this.cameras.main.y + 32, 'numbers', 0),
-                              this.add.sprite(this.game.canvas.width / 2 + 5, this.cameras.main.y + 32, 'numbers', 0));
+        this.scoreSprite.push(this.add.sprite(this.game.canvas.width / 2 - 5, this.cameras.main.y + 4, 'numbers', 0),
+                              this.add.sprite(this.game.canvas.width / 2, this.cameras.main.y + 4, 'numbers', 0),
+                              this.add.sprite(this.game.canvas.width / 2 + 5, this.cameras.main.y + 4, 'numbers', 0));
         this.scoreSprite.forEach(element => {
           element.scrollFactorX = 0;
           element.setDepth(5);
         });
         let helperUp = this.add.image(this.game.canvas.width / 2 - 128, this.game.canvas.height / 2 - 16, 'helper', 0).setOrigin(0.5);
         let helperDown = this.add.image(this.game.canvas.width / 2 - 128, this.game.canvas.height / 2 + 16, 'helper', 1).setOrigin(0.5);
-        this.add.sprite(helperUp.x + 64, helperUp.y, 'up-to-jump');
-        this.add.sprite(helperDown.x + 86, helperDown.y, 'down-to-dash');
+        this.helperUpText = this.add.sprite(helperUp.x + 64, helperUp.y, 'up-to-jump');
+        this.helperDownText = this.add.sprite(helperDown.x + 86, helperDown.y, 'down-to-dash');
     }
 
   private generatePlayer() {
@@ -219,7 +219,11 @@ export default class GameScene extends Phaser.Scene
           this.isDeath = true;
           this.physics.pause();
           let deathsnd = this.sound.play('death');
-          this.sound.get('death').on('complete', () => this.scene.start('Menu', {score: this.score}));
+          this.sound.get('death').on('complete', () => {
+            this.scoreSprite.forEach(el => el.destroy());
+            this.scoreSprite = [];
+            this.scene.start('Menu', {score: this.score})
+          });
         }
 
         this.removeSpikes();
@@ -250,7 +254,7 @@ export default class GameScene extends Phaser.Scene
     }
 
   private playerAnims() {
-    if (this.laser.x >= this.player.x - 60)
+    if (this.laser.x >= this.player.x - 60 || this.player.y > 225)
       this.player.anims.play('_laserclose');
     else if (this.laser.x >= this.player.x - 240)
       this.player.anims.play('_laserinframe');
