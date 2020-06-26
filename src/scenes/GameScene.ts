@@ -78,7 +78,7 @@ export default class GameScene extends Phaser.Scene
         this.load.spritesheet('player', 'assets/images/player.png', { frameWidth: 16, frameHeight: 16, margin: 0, spacing: 0 });
         this.load.spritesheet('tileset', 'assets/images/tileset-extruded.png', { frameWidth: 16, frameHeight: 16, margin: 1, spacing: 2 });
         this.load.spritesheet('laser', 'assets/images/laser.png', { frameWidth: 480, frameHeight: 270, margin: 0, spacing: 0 });
-        this.load.tilemapTiledJSON('tilemap', 'assets/tilemaps/tilemapFlat.json');
+        this.load.tilemapTiledJSON('tilemap', 'assets/tilemaps/tilemap.json');
         this.load.image('gradient', 'assets/images/gradient.png');
         this.load.audio('platform', 'assets/audio/platform.ogg');
         this.load.audio('jump', 'assets/audio/jump.ogg');
