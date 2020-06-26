@@ -206,6 +206,7 @@ export default class GameScene extends Phaser.Scene
     }
 
   private generatePlayer() {
+    this.playerCharacter = 0;
     this.playerCharacter = 5 * Math.round(Math.random() * 15);
     this.player = this.physics.add.sprite(this.game.canvas.width / 4, this.game.canvas.height / 2, 'player', this.playerCharacter);
     this.anims.create(
@@ -271,6 +272,8 @@ export default class GameScene extends Phaser.Scene
           this.physics.pause();
           let deathsnd = this.sound.play('death', {mute:localStorage.getItem('mutedSFX') === 'false'? false : true});
           this.sound.get('death').on('complete', () => {
+            this.destroyPlayer();
+            this.generatePlayer();
             this.scoreSprite.forEach(el => el.destroy());
             this.scoreSprite = [];
             this.scene.start('Menu', {score: this.score});
@@ -303,6 +306,17 @@ export default class GameScene extends Phaser.Scene
         this.scoreSprite[0].setFrame(parseInt(this.score.toString().split('')[0]));
       }
     }
+  
+  private destroyPlayer()
+  {
+    this.anims.remove('_laserclose');
+    this.anims.remove('_laserinframe');
+    this.anims.remove('_falling');
+    this.anims.remove('_jumping');
+    this.anims.remove('_running');
+    this.player.removeAllListeners();
+    this.player.destroy();
+  }
 
   private playerAnims() {
     if (this.laser.x >= this.player.x - 60 || this.player.y > 225)
