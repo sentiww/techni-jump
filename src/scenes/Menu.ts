@@ -27,6 +27,7 @@ export default class Menu extends Phaser.Scene {
   private themeBeatColorIndex: number;
   private muteMusicButton: Phaser.GameObjects.Image;
   private muteSFXButton: Phaser.GameObjects.Image;
+  private scoreSprites: Phaser.GameObjects.Sprite[];
 
   constructor ()
   {
@@ -39,6 +40,7 @@ export default class Menu extends Phaser.Scene {
     this.highscore = Math.max(this.highscore, this.score);
     if (this.highscore !== -1) localStorage.setItem('highscore', this.highscore.toString());
     this.themeBeatColorIndex = 0;
+    this.scoreSprites = [];
 
     if (localStorage.getItem('mutedMusic') === null) localStorage.setItem('mutedMusic', 'false');
     if (localStorage.getItem('mutedSFX') === null) localStorage.setItem('mutedSFX', 'false');
@@ -81,6 +83,9 @@ export default class Menu extends Phaser.Scene {
           this.themeBeatColorIndex = 0;
 
         this.logo.setTint(COLORS[this.themeBeatColorIndex]);
+
+        this.scoreSprites.forEach(el => el.setScale(3));
+        this.time.delayedCall(100, () => this.scoreSprites.forEach(el => el.setScale(2.2)));
       },
       loop: true,
     });
@@ -98,7 +103,7 @@ export default class Menu extends Phaser.Scene {
 
     if (this.score !== -1) {
       this.score.toString().split('').forEach((number, index) => {
-        this.add.sprite((this.game.canvas.width / 2) + 30 + 10 * index, this.game.canvas.height / 2 + 4, 'numbers', parseInt(number)).setScale(2.2);
+        this.scoreSprites.push(this.add.sprite((this.game.canvas.width / 2) + 30 + 16 * index, this.game.canvas.height / 2 + 4, 'numbers', parseInt(number)).setScale(2.2));
       })
     }
 

@@ -266,7 +266,11 @@ export default class GameScene extends Phaser.Scene
           (<Phaser.Physics.Arcade.Body>this.player.body).setVelocityY(500);
           this.sound.play('dash', {mute:localStorage.getItem('mutedSFX') === 'false'? false : true})
         }
-        if ((<Phaser.Physics.Arcade.Body>this.player.body).blocked.down) this.isPlayerDashing = false;
+        if ((<Phaser.Physics.Arcade.Body>this.player.body).blocked.down && this.isPlayerDashing) {
+          this.isPlayerDashing = false;
+          this.player.setScale(1,0.95);
+          this.time.delayedCall(100 / this.playerSpeedTimer.timeScale, () => this.player.setScale(1))
+        }
 
         if (((<Phaser.Physics.Arcade.Body>this.player.body).y > 280 ||
             (<Phaser.Physics.Arcade.Body>this.player.body).x + 8 <= this.laser.x) &&
