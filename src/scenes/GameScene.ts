@@ -270,7 +270,11 @@ export default class GameScene extends Phaser.Scene
           this.isDeath = true;
           this.physics.pause();
           let deathsnd = this.sound.play('death', {mute:localStorage.getItem('mutedSFX') === 'false'? false : true});
-          this.sound.get('death').on('complete', () => this.scene.start('Menu', {score: this.score}));
+          this.sound.get('death').on('complete', () => {
+            this.scoreSprite.forEach(el => el.destroy());
+            this.scoreSprite = [];
+            this.scene.start('Menu', {score: this.score});
+          });
         }
 
         this.removeSpikes();
