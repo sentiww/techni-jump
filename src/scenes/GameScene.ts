@@ -143,6 +143,10 @@ export default class GameScene extends Phaser.Scene
         this.sound.volume = 0.6;
         this.scoreText = this.add.text(this.game.canvas.width / 2, 0, '0');
         this.scoreText.setScrollFactor(0);
+        let helperUp = this.add.image(this.game.canvas.width / 2 - 128, this.game.canvas.height / 2 - 16, 'helper', 0).setOrigin(0.5);
+        let helperDown = this.add.image(this.game.canvas.width / 2 - 128, this.game.canvas.height / 2 + 16, 'helper', 1).setOrigin(0.5);
+        this.add.text(helperUp.x + 16, helperUp.y, 'USE UP ARROW TO JUMP').setOrigin(0, 0.5);
+        this.add.text(helperDown.x + 16, helperDown.y, 'USE DOWN ARROW TO DASH DOWN').setOrigin(0, 0.5);
     }
 
     update()
@@ -227,7 +231,7 @@ export default class GameScene extends Phaser.Scene
       let timer: Phaser.Time.TimerEvent;
       if (isKeyDown && !(<Phaser.Physics.Arcade.Body>this.player.body).blocked.up) {
         if ((<Phaser.Physics.Arcade.Body>this.player.body).blocked.down) {
-            (<Phaser.Physics.Arcade.Body>this.player.body).setVelocityY(-100);
+            (<Phaser.Physics.Arcade.Body>this.player.body).setVelocityY(-125);
             this.sound.play('jump');
             this.isPlayerJumping = true;
             timer = this.time.delayedCall(250, () => this.isPlayerJumping = false)
