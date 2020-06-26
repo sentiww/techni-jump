@@ -56,6 +56,7 @@ export default class GameScene extends Phaser.Scene
     private lastSegmentKey: string;
     private player: Phaser.GameObjects.Sprite;
     private isPlayerJumping: boolean;
+    private isPlayerDashing: boolean;
     private playerSpeedTimer: Phaser.Time.TimerEvent;
     private playerSpeed: number;
     private laserSpeed: number;
@@ -66,7 +67,7 @@ export default class GameScene extends Phaser.Scene
     private playerSlowSpeed: number;
     private scoreSprite: Phaser.GameObjects.Image[] = [];
     private playerCharacter: number;
-  
+
     public score: number;
     private isDeath: boolean;
     private musicIntro: any;
@@ -200,7 +201,7 @@ export default class GameScene extends Phaser.Scene
             this.muteSFXButton.setFrame(3);
           }
         })
-      
+
         this.add.sprite(helperUp.x + 64, helperUp.y, 'up-to-jump');
         this.add.sprite(helperDown.x + 86, helperDown.y, 'down-to-dash');
     }
@@ -259,11 +260,13 @@ export default class GameScene extends Phaser.Scene
         } else {
           this.checkPlayerJump(false);
         }
-        if (cursors.down.isDown && !(<Phaser.Physics.Arcade.Body>this.player.body).blocked.down) {
+        if (cursors.down.isDown && !(<Phaser.Physics.Arcade.Body>this.player.body).blocked.down && !this.isPlayerDashing) {
           this.isPlayerJumping = false;
+          this.isPlayerDashing = true;
           (<Phaser.Physics.Arcade.Body>this.player.body).setVelocityY(500);
           this.sound.play('dash', {mute:localStorage.getItem('mutedSFX') === 'false'? false : true})
         }
+        if ((<Phaser.Physics.Arcade.Body>this.player.body).blocked.down) this.isPlayerDashing = false;
 
         if (((<Phaser.Physics.Arcade.Body>this.player.body).y > 280 ||
             (<Phaser.Physics.Arcade.Body>this.player.body).x + 8 <= this.laser.x) &&
@@ -306,7 +309,7 @@ export default class GameScene extends Phaser.Scene
         this.scoreSprite[0].setFrame(parseInt(this.score.toString().split('')[0]));
       }
     }
-  
+
   private destroyPlayer()
   {
     this.anims.remove('_laserclose');
@@ -348,6 +351,8 @@ export default class GameScene extends Phaser.Scene
           timeScale: 1 + (1 - this.playerSpeedTimer.timeScale),
           onComplete: () => {
             this.cameras.main.shake(100 / this.playerSpeedTimer.timeScale, 0.003);
+            this.scoreSprite.forEach(el => el.setScale(1.35));
+            this.time.delayedCall(100 / this.playerSpeedTimer.timeScale, () => this.scoreSprite.forEach(el => el.setScale(1)));
             this.sound.play('platform', {mute:localStorage.getItem('mutedSFX') === 'false'? false : true});
           },
         });

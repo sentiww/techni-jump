@@ -90,9 +90,9 @@ export default class Menu extends Phaser.Scene {
     this.sound.volume = 0.6;
 
     if (this.highscore !== -1) {
-      this.add.sprite((this.game.canvas.width / 2) - 30, this.game.canvas.height / 2, 'highscore').setOrigin(0.5);
+      let hsText = this.add.sprite((this.game.canvas.width / 2) - 30, this.game.canvas.height / 2, 'highscore').setOrigin(0.5);
       this.highscore.toString().split('').forEach((number, index) => {
-        this.add.sprite((this.game.canvas.width / 2) - 32 + 5 * index, this.game.canvas.height / 2 + 8, 'numbers', parseInt(number));
+        this.add.sprite((hsText.x - 2.5 * (this.highscore.toString().split('').length - 1)) + 5 * index, this.game.canvas.height / 2 + 8, 'numbers', parseInt(number));
       })
     }
 
