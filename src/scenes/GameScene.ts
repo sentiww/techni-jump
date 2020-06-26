@@ -151,8 +151,8 @@ export default class GameScene extends Phaser.Scene
         });
         let helperUp = this.add.image(this.game.canvas.width / 2 - 128, this.game.canvas.height / 2 - 16, 'helper', 0).setOrigin(0.5);
         let helperDown = this.add.image(this.game.canvas.width / 2 - 128, this.game.canvas.height / 2 + 16, 'helper', 1).setOrigin(0.5);
-        this.helperUpText = this.add.sprite(helperUp.x + 64, helperUp.y, 'up-to-jump');
-        this.helperDownText = this.add.sprite(helperDown.x + 86, helperDown.y, 'down-to-dash');
+        this.add.sprite(helperUp.x + 64, helperUp.y, 'up-to-jump');
+        this.add.sprite(helperDown.x + 86, helperDown.y, 'down-to-dash');
     }
 
   private generatePlayer() {
