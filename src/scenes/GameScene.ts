@@ -75,7 +75,8 @@ export default class GameScene extends Phaser.Scene
         this.load.image('gradient', 'assets/images/gradient.png');
         this.load.audio('platform', 'assets/audio/platform.ogg');
         this.load.audio('jump', 'assets/audio/jump.ogg');
-        this.load.audio('death', 'assets/audio/ded.ogg')
+        this.load.audio('death', 'assets/audio/ded.ogg');
+        this.load.audio('music', 'assets/audio/level-music.ogg');
         this.cameras.main.setBackgroundColor('#000000');
     }
 
@@ -132,7 +133,8 @@ export default class GameScene extends Phaser.Scene
         (<Phaser.Physics.Arcade.Body>this.player.body).setVelocityX(this.playerSpeed);
         this.spikeProbability = 0.10;
         this.sound.stopAll();
-        this.sound.volume = 0.6
+        this.sound.play('music');
+        this.sound.volume = 0.6;
     }
 
     update()
