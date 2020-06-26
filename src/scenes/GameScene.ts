@@ -38,7 +38,7 @@ const MAX_SPEED: number = 250;
 const SPEED_INC_TIME: number = 1000;
 const SPEED_INC_STEP: number = 2;
 const SPEED_INC_TIMEFACTOR: number = -0.002;
-const SPIKE_IDS: number[] = [601,605,609,613,617,621,625,629,633,637];
+const SPIKE_IDS: number[] = [581,585,589,593,597,601,605,609,613,617,621,625,629,633,637];
 const SPEED_INC_TIME_AFTER_SLOW: number = 200;
 
 
@@ -105,7 +105,7 @@ export default class GameScene extends Phaser.Scene
                     data: layer.data.map(tiles => tiles.map(tile => tile.index)),
                 };
             });
-        this.player = this.physics.add.sprite(8, 8, 'player', Math.floor(Math.random() * 3));
+        this.player = this.physics.add.sprite(this.game.canvas.width / 4, this.game.canvas.height / 2, 'player', Math.floor(Math.random() * 15));
         this.player.setDepth(1);
         this.playerSpeedTimer = this.time.addEvent({
             delay: SPEED_INC_TIME,
@@ -117,7 +117,7 @@ export default class GameScene extends Phaser.Scene
             },
             loop: true
         });
-        this.generateMap();
+        this.generateMap(true);
         this.laser = this.physics.add.sprite(-480, 0, 'laser').setOrigin(1, 0).setDepth(3);
         this.anims.create(
         {
@@ -157,7 +157,6 @@ export default class GameScene extends Phaser.Scene
               timeScale: 1 + (1 - this.playerSpeedTimer.timeScale),
               onComplete: () => {
                 this.cameras.main.shake(100 / this.playerSpeedTimer.timeScale, 0.003);
-                //this.cameras.main.flash(50 / this.playerSpeedTimer.timeScale, 255, 255, 255);
                 this.sound.play('platform');
               },
             });
@@ -184,6 +183,7 @@ export default class GameScene extends Phaser.Scene
         }
         (<Phaser.Physics.Arcade.Body>this.laser.body).setVelocityX(this.playerSpeed);
 
+
         const cursors = this.input.keyboard.createCursorKeys();
 
         if (cursors.up.isDown) {
@@ -208,8 +208,6 @@ export default class GameScene extends Phaser.Scene
 
         this.spikeCheck();
         this.removeSpikes();
-        console.log("PL SPD:", this.playerSpeed);
-        console.log("PL VEL:", (<Phaser.Physics.Arcade.Body>this.player.body).velocity.x);
     }
 
     private checkPlayerJump(isKeyDown: boolean) {
@@ -236,15 +234,17 @@ export default class GameScene extends Phaser.Scene
       }
     }
 
-    private generateMap()
+    private generateMap(isStart = false)
     {
         while (this.map.length < 12) {
             let next = this.originSegments.map(segment => segment.key);
             if (this.map.length > 0)
               next = this.originSegments.find(segment => segment.key === this.lastSegmentKey).next;
+            if (isStart && this.map.length < 5)
+              next = ['start'];
             const key = next[Math.floor(Math.random() * next.length)];
             const segment = this.make.tilemap({ data: this.originSegments.find(segment => segment.key === key).data, tileWidth: TILE_WIDTH, tileHeight: TILE_HEIGHT });
-            if (this.map.length < 6) {
+            if (isStart && this.map.length < 6) {
               segment.forEachTile(tile => {
                 if(SPIKE_IDS.includes(tile.index))
                 {
@@ -253,7 +253,7 @@ export default class GameScene extends Phaser.Scene
                 }
               })
               segment.createDynamicLayer('layer', this.originTileset, this.nextSegmentPosition, 0).setDepth(2);
-            } 
+            }
             else {
               this.createSpikes(segment);
               segment.createDynamicLayer('layer', this.originTileset, this.nextSegmentPosition, -280).setDepth(2);
