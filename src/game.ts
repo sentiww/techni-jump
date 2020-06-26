@@ -58,7 +58,7 @@ window.onload = () => {
         physics: {
             default: 'arcade',
             arcade: {
-                gravity: { y: 210 },
+                gravity: { y: 400 },
             }
         }
     });
