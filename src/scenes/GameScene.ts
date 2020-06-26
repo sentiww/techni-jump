@@ -238,7 +238,7 @@ export default class GameScene extends Phaser.Scene
             let next = this.originSegments.map(segment => segment.key);
             if (this.map.length > 0)
               next = this.originSegments.find(segment => segment.key === this.lastSegmentKey).next;
-            if (isStart && this.map.length < 6)
+            if (isStart && this.map.length < 5)
               next = ['start'];
             const key = next[Math.floor(Math.random() * next.length)];
             const segment = this.make.tilemap({ data: this.originSegments.find(segment => segment.key === key).data, tileWidth: TILE_WIDTH, tileHeight: TILE_HEIGHT });
