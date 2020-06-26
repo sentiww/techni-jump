@@ -17,17 +17,21 @@ interface SpikeData {
 }
 
 enum colorMap {
-  red = 0xff0000,
-  orange = 0xff8000,
-  yellow = 0xffff00,
-  purple = 0xff0080,
-  pink = 0xff00ff,
-  green = 0x00ff00,
-  cyan = 0x00ffff,
-  blue = 0x0000ff,
-  lime = 0x00ff80,
+  red = 0xec1b30,
+  orange = 0xf36523,
+  yellow = 0xffec01,
+  purple = 0xbf245e,
+  pink = 0x942977,
+  green = 0x8ec63f,
+  cyan = 0x00b9f2,
+  blue = 0x034da2,
+  lime = 0x00a640,
   white = 0xffffff,
-  start = 0xffffff
+  pacific = 0x008fd5,
+  kingfisher = 0x662e91,
+  amber = 0xffc20f,
+  fuego = 0xcadb2a,
+  salem = 0x008a4c,
 }
 
 const SEGMENT_WIDTH: number = 5;
@@ -55,11 +59,14 @@ export default class GameScene extends Phaser.Scene
     private isPlayerJumping: boolean;
     private playerSpeedTimer: Phaser.Time.TimerEvent;
     private playerSpeed: number;
+    private laserSpeed: number;
     private laser: Phaser.GameObjects.Sprite;
     private spikeProbability: number;
     private spikes: SpikeData[] = [];
     private beFastAgainTimer: Phaser.Time.TimerEvent = null;
     private playerSlowSpeed: number;
+    private scoreText: Phaser.GameObjects.Text;
+    public score: number;
 
     constructor ()
     {
@@ -71,7 +78,7 @@ export default class GameScene extends Phaser.Scene
         this.load.spritesheet('player', 'assets/images/player.png', { frameWidth: 16, frameHeight: 16, margin: 0, spacing: 0 });
         this.load.spritesheet('tileset', 'assets/images/tileset-extruded.png', { frameWidth: 16, frameHeight: 16, margin: 1, spacing: 2 });
         this.load.spritesheet('laser', 'assets/images/laser.png', { frameWidth: 480, frameHeight: 270, margin: 0, spacing: 0 });
-        this.load.tilemapTiledJSON('tilemap', 'assets/tilemaps/tilemap.json');
+        this.load.tilemapTiledJSON('tilemap', 'assets/tilemaps/tilemapFlat.json');
         this.load.image('gradient', 'assets/images/gradient.png');
         this.load.audio('platform', 'assets/audio/platform.ogg');
         this.load.audio('jump', 'assets/audio/jump.ogg');
@@ -88,8 +95,10 @@ export default class GameScene extends Phaser.Scene
         this.nextSegmentPosition = 0;
         this.lastSegmentKey = null;
         this.playerSpeed = INITIAL_SPEED;
+        this.laserSpeed = INITIAL_SPEED - 30;
         if (this.beFastAgainTimer !== null) this.beFastAgainTimer.destroy();
         this.playerSlowSpeed = null;
+        this.score = 0;
     }
 
     create()
@@ -112,13 +121,17 @@ export default class GameScene extends Phaser.Scene
             callback: () => {
                 if (this.playerSpeed < MAX_SPEED) {
                     this.playerSpeed = Math.min(MAX_SPEED, this.playerSpeed + SPEED_INC_STEP);
-                    this.playerSpeedTimer.timeScale += SPEED_INC_TIMEFACTOR;
                 }
+                let laserMaxSpeed = this.playerSpeed - 10;
+                if (this.laserSpeed < laserMaxSpeed) {
+                    this.laserSpeed = Math.min(laserMaxSpeed, this.laserSpeed + SPEED_INC_STEP * 2);
+                }
+                this.playerSpeedTimer.timeScale += SPEED_INC_TIMEFACTOR;
             },
             loop: true
         });
         this.generateMap(true);
-        this.laser = this.physics.add.sprite(-480, 0, 'laser').setOrigin(1, 0).setDepth(3);
+        this.laser = this.physics.add.sprite(32, 0, 'laser').setOrigin(1, 0).setDepth(3);
         this.anims.create(
         {
           key: '_laser',
@@ -135,6 +148,8 @@ export default class GameScene extends Phaser.Scene
         this.sound.stopAll();
         this.sound.play('music');
         this.sound.volume = 0.6;
+        this.scoreText = this.add.text(this.game.canvas.width / 2, 0, '0');
+        this.scoreText.setScrollFactor(0);
     }
 
     update()
@@ -158,6 +173,8 @@ export default class GameScene extends Phaser.Scene
               onComplete: () => {
                 this.cameras.main.shake(100 / this.playerSpeedTimer.timeScale, 0.003);
                 this.sound.play('platform');
+                this.scoreText.setScale(0.9);
+                this.time.delayedCall(100 / this.playerSpeedTimer.timeScale, () => this.scoreText.setScale(1))
               },
             });
             let gradientHint = this.gradients.find(sprite => sprite.x === tilemapLayerGameObj.x)
@@ -181,7 +198,7 @@ export default class GameScene extends Phaser.Scene
           (<Phaser.Physics.Arcade.Body>this.player.body)
               .setVelocityX(this.playerSlowSpeed);
         }
-        (<Phaser.Physics.Arcade.Body>this.laser.body).setVelocityX(this.playerSpeed);
+        (<Phaser.Physics.Arcade.Body>this.laser.body).setVelocityX(this.laserSpeed);
 
 
         const cursors = this.input.keyboard.createCursorKeys();
@@ -190,6 +207,10 @@ export default class GameScene extends Phaser.Scene
           this.checkPlayerJump(true);
         } else {
           this.checkPlayerJump(false);
+        }
+        if (cursors.down.isDown && !(<Phaser.Physics.Arcade.Body>this.player.body).blocked.down) {
+          this.isPlayerJumping = false;
+          (<Phaser.Physics.Arcade.Body>this.player.body).setVelocityY(500);
         }
 
         if (cursors.space.isDown) {
@@ -208,20 +229,23 @@ export default class GameScene extends Phaser.Scene
 
         this.spikeCheck();
         this.removeSpikes();
+        this.score =
+            Math.ceil(Math.max(0, (<Phaser.Physics.Arcade.Body>this.player.body).x - 480) / 80);
+        this.scoreText.setText(this.score.toString());
     }
 
     private checkPlayerJump(isKeyDown: boolean) {
       let yVel: number = (<Phaser.Physics.Arcade.Body>this.player.body).velocity.y;
       let timer: Phaser.Time.TimerEvent;
-      if (isKeyDown) {
+      if (isKeyDown && !(<Phaser.Physics.Arcade.Body>this.player.body).blocked.up) {
         if ((<Phaser.Physics.Arcade.Body>this.player.body).blocked.down) {
-            (<Phaser.Physics.Arcade.Body>this.player.body).setVelocityY(-15);
+            (<Phaser.Physics.Arcade.Body>this.player.body).setVelocityY(-100);
             this.sound.play('jump');
             this.isPlayerJumping = true;
-            timer = this.time.delayedCall(200, () => this.isPlayerJumping = false)
+            timer = this.time.delayedCall(250, () => this.isPlayerJumping = false)
         } else if (this.isPlayerJumping &&
                   !(<Phaser.Physics.Arcade.Body>this.player.body).blocked.up) {
-          let newVelocity = yVel - 20 * (200 + yVel) / 200;
+          let newVelocity = yVel - 30 * (200 + yVel) / 200;
           (<Phaser.Physics.Arcade.Body>this.player.body)
               .setVelocityY(newVelocity);
         } else {
@@ -244,7 +268,7 @@ export default class GameScene extends Phaser.Scene
               next = ['start'];
             const key = next[Math.floor(Math.random() * next.length)];
             const segment = this.make.tilemap({ data: this.originSegments.find(segment => segment.key === key).data, tileWidth: TILE_WIDTH, tileHeight: TILE_HEIGHT });
-            if (isStart && this.map.length < 6) { 
+            if (isStart && this.map.length < 6) {
               segment.forEachTile(tile => {
                 if(SPIKE_IDS.includes(tile.index))
                 {
@@ -325,7 +349,6 @@ export default class GameScene extends Phaser.Scene
           && this.playerSpeed > 20                                    //Checking if speed is above 20
           && spike.spikeEnabled)                                      //Checking if the spike hasn't been activated into before
           {
-            console.log('HA!');
             this.slowPlayer();
             spike.spikeEnabled = false;                               //Disabling the spike
           }
@@ -333,10 +356,10 @@ export default class GameScene extends Phaser.Scene
     }
     private slowPlayer() {
       if (this.playerSlowSpeed !== null) {
-        this.playerSlowSpeed = this.playerSpeed / 2;
+        this.playerSlowSpeed = this.playerSpeed / 1.75;
         return;
       }
-      this.playerSlowSpeed = this.playerSpeed / 2;
+      this.playerSlowSpeed = this.playerSpeed / 1.75;
       this.beFastAgainTimer = this.time.addEvent({
           delay: SPEED_INC_TIME_AFTER_SLOW,
           callback: () => {
