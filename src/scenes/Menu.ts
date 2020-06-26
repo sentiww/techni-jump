@@ -51,10 +51,15 @@ export default class Menu extends Phaser.Scene {
       this.load.spritesheet('muteBtn', 'assets/images/mute-buttons.png', { frameWidth: 16, frameHeight: 16, margin: 0, spacing: 0 });
       this.load.spritesheet('tileset', 'assets/images/tileset-extruded.png', { frameWidth: 16, frameHeight: 16, margin: 1, spacing: 2 });
       this.load.spritesheet('laser', 'assets/images/laser.png', { frameWidth: 480, frameHeight: 270, margin: 0, spacing: 0 });
-      this.load.tilemapTiledJSON('tilemap', 'assets/tilemaps/tilemapFlat.json');
+      this.load.tilemapTiledJSON('tilemap', 'assets/tilemaps/tilemap.json');
+      this.load.spritesheet('numbers', 'assets/images/nums.png', { frameWidth: 5, frameHeight: 7, margin: 0, spacing: 0 });
+      this.load.tilemapTiledJSON('tilemap', 'assets/tilemaps/tilemap.json');
       this.load.image('gradient', 'assets/images/gradient.png');
       this.load.image('logo', 'assets/images/techni.png');
       this.load.image('startBtn', 'assets/images/start.png');
+      this.load.image('up-to-jump', 'assets/images/up-to-jump.png');
+      this.load.image('down-to-dash', 'assets/images/down-to-dash.png');
+      this.load.image('highscore', 'assets/images/highscore.png');
       this.load.audio('platform', 'assets/audio/platform.ogg');
       this.load.audio('jump', 'assets/audio/jump.ogg');
       this.load.audio('dash', 'assets/audio/dash.ogg');
@@ -84,12 +89,16 @@ export default class Menu extends Phaser.Scene {
     this.sound.volume = 0.6;
 
     if (this.highscore !== -1) {
-      this.add.text(this.game.canvas.width / 2, 48, 'Highscore:').setOrigin(0.5);
-      this.add.text(this.game.canvas.width / 2, 64, this.highscore.toString()).setOrigin(0.5);
+      this.add.sprite(this.game.canvas.width / 2, 48, 'highscore').setOrigin(0.5);
+      this.highscore.toString().split('').forEach((number, index) => {
+        this.add.sprite(this.game.canvas.width / 2 + 5 * index, 64, 'numbers', parseInt(number));
+      })
     }
 
     if (this.score !== -1) {
-      this.add.text(this.game.canvas.width / 2, this.game.canvas.height / 2, this.score.toString()).setOrigin(0.5);
+      this.score.toString().split('').forEach((number, index) => {
+        this.add.sprite(this.game.canvas.width / 2 + 5 * index, this.game.canvas.height / 2, 'numbers', parseInt(number));
+      })
     }
 
     this.startButton = this.add.image(this.game.canvas.width / 2, this.game.canvas.height / 2 + 64, 'startBtn').setOrigin(0.5).setInteractive().setScale(0.8);
